@@ -1,0 +1,1991 @@
+---
+openapi: 3.1.0
+components:
+  schemas:
+    OperatingSystem:
+      type: string
+      enum:
+      - linux
+      - windows
+      - mac
+      - solaris
+      - aix
+      - alpine-linux
+    ReleaseType:
+      type: string
+      enum:
+      - ga
+      - ea
+      default: ga
+    SortMethod:
+      type: string
+      enum:
+      - DEFAULT
+      - DATE
+      description: "DEFAULT sort order is by: version, then date, then name, then\
+        \ id. DATE sorts by date, then version, then name, then id."
+      default: DEFAULT
+    AdoptiumJvmImpl:
+      type: string
+      enum:
+      - hotspot
+    Architecture:
+      type: string
+      enum:
+      - x64
+      - x86
+      - x32
+      - ppc64
+      - ppc64le
+      - s390x
+      - aarch64
+      - arm
+      - sparcv9
+      - riscv64
+    Installer:
+      type: object
+      required:
+      - name
+      - link
+      properties:
+        metadata_link:
+          type:
+          - string
+          - "null"
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-openj9-releases/ga/download/jdk8u162-b12_openj9-0.8.0/OpenJDK8-OPENJ9_x64_Linux_jdk8u162-b12_openj9-0.8.0.tar.gz.json
+        size:
+          type: integer
+          format: int64
+          examples:
+          - 82573385
+        checksum_link:
+          type:
+          - string
+          - "null"
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-openj9-releases/ga/download/jdk8u162-b12_openj9-0.8.0/OpenJDK8-OPENJ9_x64_Linux_jdk8u162-b12_openj9-0.8.0.tar.gz.sha256.txt
+        name:
+          type: string
+          examples:
+          - OpenJDK8U-jre_x86-32_windows_hotspot_8u212b04.msi
+        link:
+          type: string
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-binaries/ga/download/jdk8u212-b04/OpenJDK8U-jre_x86-32_windows_hotspot_8u212b04.msi
+        checksum:
+          type:
+          - string
+          - "null"
+          examples:
+          - dd28d6d2cde2b931caf94ac2422a2ad082ea62f0beee3bf7057317c53093de93
+        signature_link:
+          type:
+          - string
+          - "null"
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk11-upstream-binaries/releases/download/jdk-11.0.5%2B10/OpenJDK11U-jdk_x64_linux_11.0.5_10.tar.gz.sign
+        download_count:
+          type: integer
+          format: int64
+          examples:
+          - 2
+    ReleaseNote:
+      type: object
+      required:
+      - id
+      properties:
+        component:
+          type:
+          - string
+          - "null"
+        subcomponent:
+          type:
+          - string
+          - "null"
+        backportOf:
+          type:
+          - string
+          - "null"
+        link:
+          type:
+          - string
+          - "null"
+        id:
+          type: string
+        title:
+          type:
+          - string
+          - "null"
+        priority:
+          type:
+          - string
+          - "null"
+        type:
+          type:
+          - string
+          - "null"
+    ReleaseNotesPackage:
+      type: object
+      required:
+      - name
+      - link
+      properties:
+        size:
+          type: integer
+          format: int64
+          examples:
+          - 82573385
+        name:
+          type: string
+          examples:
+          - OpenJDK8U-sources_8u232b09.tar.gz
+        link:
+          type: string
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-upstream-binaries/releases/download/jdk8u232-b09/OpenJDK8U-sources_8u232b09.tar.gz
+    SortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: DESC
+    project:
+      type: string
+      enum:
+      - jdk
+      - valhalla
+      - metropolis
+      - jfr
+      - shenandoah
+      description: Project
+      default: jdk
+    JvmImpl:
+      $ref: "#/components/schemas/AdoptiumJvmImpl"
+    Vendor:
+      $ref: "#/components/schemas/AdoptiumVendor"
+    HeapSize:
+      type: string
+      enum:
+      - normal
+      - large
+      examples:
+      - normal
+    SourcePackage:
+      type: object
+      required:
+      - name
+      - link
+      properties:
+        size:
+          type: integer
+          format: int64
+          examples:
+          - 82573385
+        name:
+          type: string
+          examples:
+          - OpenJDK8U-sources_8u232b09.tar.gz
+        link:
+          type: string
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-upstream-binaries/releases/download/jdk8u232-b09/OpenJDK8U-sources_8u232b09.tar.gz
+    DateTime:
+      type: string
+      description: <p>Date/time. When only a date is given the time is set to the
+        end of the given day. <ul> <li>2020-01-21</li> <li>2020-01-21T10:15:30</li>
+        <li>20200121</li> <li>2020-12-21T10:15:30Z</li> <li>2020-12-21+01:00</li>
+        </ul></p>
+    ImageType:
+      type: string
+      enum:
+      - jdk
+      - jre
+      - testimage
+      - debugimage
+      - staticlibs
+      - sources
+      - sbom
+      examples:
+      - jdk
+    VersionData:
+      type: object
+      required:
+      - semver
+      - openjdk_version
+      properties:
+        patch:
+          type:
+          - integer
+          - "null"
+          format: int32
+        security:
+          type: integer
+          format: int32
+        pre:
+          type:
+          - string
+          - "null"
+        openjdk_version:
+          type: string
+          examples:
+          - 11.0.4+10-201907081820
+        major:
+          type: integer
+          format: int32
+        minor:
+          type: integer
+          format: int32
+        build:
+          type: integer
+          format: int32
+        semver:
+          type: string
+          examples:
+          - 11.0.0+28
+        adopt_build_number:
+          type:
+          - integer
+          - "null"
+          format: int32
+        optional:
+          type:
+          - string
+          - "null"
+    BinaryAssetView:
+      type: object
+      required:
+      - release_name
+      - release_link
+      properties:
+        release_name:
+          type: string
+          examples:
+          - jdk8u162-b12_openj9-0.8.0
+        release_link:
+          type: string
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-openj9-releases/ga/tag/jdk8u162-b12_openj9-0.8.0
+        vendor:
+          $ref: "#/components/schemas/Vendor"
+          type: object
+        binary:
+          $ref: "#/components/schemas/Binary"
+          type: object
+        version:
+          $ref: "#/components/schemas/VersionData"
+          type: object
+    AdoptiumVendor:
+      type: string
+      enum:
+      - eclipse
+      examples:
+      - eclipse
+      default: eclipse
+    Binary:
+      type: object
+      required:
+      - os
+      - architecture
+      - image_type
+      - heap_size
+      - updated_at
+      - project
+      properties:
+        package:
+          $ref: "#/components/schemas/Package"
+          type: object
+        installer:
+          $ref: "#/components/schemas/Installer"
+          type: object
+        os:
+          $ref: "#/components/schemas/OperatingSystem"
+        updated_at:
+          $ref: "#/components/schemas/DateTime"
+        c_lib:
+          anyOf:
+          - $ref: "#/components/schemas/CLib"
+          - type: "null"
+        jvm_impl:
+          $ref: "#/components/schemas/JvmImpl"
+        scm_ref:
+          type:
+          - string
+          - "null"
+          examples:
+          - dd28d6d2cde2b931caf94ac2422a2ad082ea62f0beee3bf7057317c53093de93
+        project:
+          $ref: "#/components/schemas/project"
+        heap_size:
+          $ref: "#/components/schemas/HeapSize"
+        architecture:
+          $ref: "#/components/schemas/Architecture"
+        image_type:
+          $ref: "#/components/schemas/ImageType"
+        download_count:
+          type: integer
+          format: int64
+          examples:
+          - 3899
+    Package:
+      type: object
+      required:
+      - name
+      - link
+      properties:
+        metadata_link:
+          type:
+          - string
+          - "null"
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-openj9-releases/ga/download/jdk8u162-b12_openj9-0.8.0/OpenJDK8-OPENJ9_x64_Linux_jdk8u162-b12_openj9-0.8.0.tar.gz.json
+        size:
+          type: integer
+          format: int64
+          examples:
+          - 82573385
+        checksum_link:
+          type:
+          - string
+          - "null"
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-openj9-releases/ga/download/jdk8u162-b12_openj9-0.8.0/OpenJDK8-OPENJ9_x64_Linux_jdk8u162-b12_openj9-0.8.0.tar.gz.sha256.txt
+        name:
+          type: string
+          examples:
+          - OpenJDK8U-jre_x86-32_windows_hotspot_8u212b04.msi
+        link:
+          type: string
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-binaries/ga/download/jdk8u212-b04/OpenJDK8U-jre_x86-32_windows_hotspot_8u212b04.msi
+        checksum:
+          type:
+          - string
+          - "null"
+          examples:
+          - dd28d6d2cde2b931caf94ac2422a2ad082ea62f0beee3bf7057317c53093de93
+        signature_link:
+          type:
+          - string
+          - "null"
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk11-upstream-binaries/releases/download/jdk-11.0.5%2B10/OpenJDK11U-jdk_x64_linux_11.0.5_10.tar.gz.sign
+        download_count:
+          type: integer
+          format: int64
+          examples:
+          - 2
+    CLib:
+      type: string
+      enum:
+      - musl
+      - glibc
+    Release:
+      type: object
+      required:
+      - id
+      - release_link
+      - release_name
+      - timestamp
+      - updated_at
+      - binaries
+      - release_type
+      - version_data
+      properties:
+        release_notes:
+          anyOf:
+          - $ref: "#/components/schemas/ReleaseNotesPackage"
+          - type: "null"
+        release_link:
+          type: string
+          examples:
+          - https://github.com/AdoptOpenJDK/openjdk8-openj9-releases/ga/tag/jdk8u162-b12_openj9-0.8.0
+        release_type:
+          $ref: "#/components/schemas/ReleaseType"
+        source:
+          anyOf:
+          - $ref: "#/components/schemas/SourcePackage"
+          - type: "null"
+        version_data:
+          $ref: "#/components/schemas/VersionData"
+        download_count:
+          type: integer
+          format: int64
+          examples:
+          - 7128
+        aqavit_results_link:
+          type:
+          - string
+          - "null"
+          examples:
+          - https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.6%2B10/AQAvitTapFiles.tar.gz
+        release_name:
+          type: string
+          examples:
+          - jdk8u162-b12_openj9-0.8.0
+        updated_at:
+          $ref: "#/components/schemas/DateTime"
+        vendor:
+          $ref: "#/components/schemas/Vendor"
+        id:
+          type: string
+          examples:
+          - VXNlci0xMA==
+        binaries:
+          type: array
+          items:
+            $ref: "#/components/schemas/Binary"
+        timestamp:
+          $ref: "#/components/schemas/DateTime"
+    StatsSource:
+      type: string
+      enum:
+      - github
+      - dockerhub
+      - all
+      examples:
+      - all
+      default: all
+info:
+  description: ""
+  title: v3
+  version: 3.0.0
+servers:
+- url: https://api.adoptium.net
+- url: https://staging-api.adoptium.net
+tags:
+- name: Assets
+- name: Binary
+- name: Checksum
+- name: Installer
+- name: Release Info
+- name: Signature
+- name: Types
+- name: Version
+paths:
+  /v3/assets/feature_releases/{feature_version}/{release_type}:
+    get:
+      summary: Returns release information
+      description: List of information about builds that match the current query
+      operationId: searchReleases
+      tags:
+      - Assets
+      parameters:
+      - description: "\n<p>\n    Feature release version you wish to download. Feature\
+          \ versions are whole numbers e.g. <code>8,11,16,17,18</code>.\n</p>\n<p>\n\
+          \    Available Feature versions can be obtained from \n    <a href=\"https://api.adoptium.net/v3/info/available_releases\"\
+          >https://api.adoptium.net/v3/info/available_releases</a>\n</p>\n"
+        name: feature_version
+        required: true
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 8
+        in: path
+      - description: |2
+
+          <p>Type of release. Either a release version, known as General Availability(ga) or an Early Access(ea) </p>
+        name: release_type
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ReleaseType"
+          - {}
+      - description: Architecture
+        name: architecture
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: '<p>Return binaries whose updated_at is before the given date/time.
+          When a date is given the match is inclusive of the given day. <ul> <li>2020-01-21</li>
+          <li>2020-01-21T10:15:30</li> <li>20200121</li> <li>2020-12-21T10:15:30Z</li>
+          <li>2020-12-21+01:00</li> </ul></p> '
+        name: before
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/DateTime"
+          - {}
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Heap Size
+        name: heap_size
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Operating System
+        name: os
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: Pagination page number
+        name: page
+        required: false
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 0
+        in: query
+      - description: Pagination page size
+        name: page_size
+        required: false
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 10
+          maximum: 20
+        in: query
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      - description: Result sort method
+        name: sort_method
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/SortMethod"
+          - {}
+      - description: Result sort order
+        name: sort_order
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/SortOrder"
+          - {}
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Release"
+        "400":
+          description: bad input parameter
+  /v3/assets/latest/{feature_version}/{jvm_impl}:
+    get:
+      summary: Returns list of latest assets for the given feature version and jvm
+        impl
+      operationId: getLatestAssets
+      tags:
+      - Assets
+      parameters:
+      - description: "\n<p>\n    Feature release version you wish to download. Feature\
+          \ versions are whole numbers e.g. <code>8,11,16,17,18</code>.\n</p>\n<p>\n\
+          \    Available Feature versions can be obtained from \n    <a href=\"https://api.adoptium.net/v3/info/available_releases\"\
+          >https://api.adoptium.net/v3/info/available_releases</a>\n</p>\n"
+        name: feature_version
+        required: true
+        schema:
+          type: integer
+          default: 8
+        in: path
+      - description: JVM Implementation
+        name: jvm_impl
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Architecture
+        name: architecture
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: Operating System
+        name: os
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BinaryAssetView"
+  /v3/assets/release_name/{vendor}/{release_name}:
+    get:
+      summary: Returns release information
+      description: List of releases with the given release name
+      operationId: getReleaseInfo
+      tags:
+      - Assets
+      parameters:
+      - description: 'Name of the release i.e '
+        name: release_name
+        required: true
+        in: path
+        schema:
+          type:
+          - string
+          - "null"
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      - description: Architecture
+        name: architecture
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Heap Size
+        name: heap_size
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Operating System
+        name: os
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      responses:
+        "200":
+          description: Release with the given vendor and name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Release"
+        "400":
+          description: bad input parameter
+        "404":
+          description: no releases match the request
+        "500":
+          description: multiple releases match the request
+  /v3/assets/version/{version}:
+    get:
+      summary: Returns release information about the specified version.
+      description: 'List of information about builds that match the current query '
+      operationId: searchReleasesByVersion
+      tags:
+      - Assets
+      parameters:
+      - description: |2
+
+          Java version range (maven style) of versions to include.
+
+          e.g:
+          * `11.0.4.1+11.1`
+          * `[1.0,2.0)`
+          * `(,1.0]`
+
+          Details of maven version ranges can be found at
+              <https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html>
+        name: version
+        required: true
+        in: path
+        schema:
+          type: string
+      - description: Architecture
+        name: architecture
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Heap Size
+        name: heap_size
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Include only LTS releases
+        name: lts
+        required: false
+        in: query
+        schema:
+          type:
+          - boolean
+          - "null"
+      - description: Operating System
+        name: os
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: Pagination page number
+        name: page
+        required: false
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 0
+        in: query
+      - description: Pagination page size
+        name: page_size
+        required: false
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 10
+          maximum: 20
+        in: query
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      - description: |2
+
+          <p>Type of release. Either a release version, known as General Availability(ga) or an Early Access(ea) </p>
+        name: release_type
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ReleaseType"
+          - {}
+      - description: Indicates that any version arguments provided in this request
+          were Adoptium semantic versions
+        name: semver
+        required: false
+        schema:
+          type:
+          - boolean
+          - "null"
+          default: false
+        in: query
+      - description: Result sort method
+        name: sort_method
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/SortMethod"
+          - {}
+      - description: Result sort order
+        name: sort_order
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/SortOrder"
+          - {}
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Release"
+        "400":
+          description: bad input parameter
+  /v3/binary/latest/{feature_version}/{release_type}/{os}/{arch}/{image_type}/{jvm_impl}/{heap_size}/{vendor}:
+    get:
+      summary: Redirects to the binary that matches your current query
+      description: Redirects to the binary that matches your current query
+      operationId: getBinary
+      tags:
+      - Binary
+      parameters:
+      - description: Architecture
+        name: arch
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: "\n<p>\n    Feature release version you wish to download. Feature\
+          \ versions are whole numbers e.g. <code>8,11,16,17,18</code>.\n</p>\n<p>\n\
+          \    Available Feature versions can be obtained from \n    <a href=\"https://api.adoptium.net/v3/info/available_releases\"\
+          >https://api.adoptium.net/v3/info/available_releases</a>\n</p>\n"
+        name: feature_version
+        required: true
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 8
+        in: path
+      - description: Heap Size
+        name: heap_size
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Operating System
+        name: os
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: |2
+
+          <p>Type of release. Either a release version, known as General Availability(ga) or an Early Access(ea) </p>
+        name: release_type
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ReleaseType"
+          - {}
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      responses:
+        "307":
+          description: link to binary that matches your current query
+        "400":
+          description: bad input parameter
+        "404":
+          description: No matching binary found
+  /v3/binary/version/{release_name}/{os}/{arch}/{image_type}/{jvm_impl}/{heap_size}/{vendor}:
+    get:
+      summary: Redirects to the binary that matches your current query
+      description: Redirects to the binary that matches your current query
+      operationId: getBinaryByVersion
+      tags:
+      - Binary
+      parameters:
+      - description: Architecture
+        name: arch
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: Heap Size
+        name: heap_size
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Operating System
+        name: os
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: "\n<p>\n    Name of the release as displayed in github or <a\
+          \ href=\"https://adoptopenjdk.net/\">https://adoptopenjdk.net/</a> e.g\n\
+          \    <code>jdk-11.0.4+11, jdk8u172-b00-201807161800</code>.\n</p>\n<p>\n\
+          \    A list of release names can be obtained from \n    <a href=\"https://api.adoptium.net/v3/info/release_names\"\
+          >https://api.adoptium.net/v3/info/release_names</a>\n</p>\n"
+        name: release_name
+        required: true
+        schema:
+          type:
+          - string
+          - "null"
+          default: jdk-11.0.6+10
+        in: path
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      responses:
+        "307":
+          description: link to binary that matches your current query
+        "400":
+          description: bad input parameter
+        "404":
+          description: No matching binary found
+  /v3/checksum/version/{release_name}/{os}/{arch}/{image_type}/{jvm_impl}/{heap_size}/{vendor}:
+    get:
+      summary: Redirects to the checksum of the release that matches your current
+        query
+      description: Redirects to the checksum of the release that matches your current
+        query
+      operationId: getChecksumByVersion
+      tags:
+      - Checksum
+      parameters:
+      - description: Architecture
+        name: arch
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: Heap Size
+        name: heap_size
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Operating System
+        name: os
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: "\n<p>\n    Name of the release as displayed in github or <a\
+          \ href=\"https://adoptopenjdk.net/\">https://adoptopenjdk.net/</a> e.g\n\
+          \    <code>jdk-11.0.4+11, jdk8u172-b00-201807161800</code>.\n</p>\n<p>\n\
+          \    A list of release names can be obtained from \n    <a href=\"https://api.adoptium.net/v3/info/release_names\"\
+          >https://api.adoptium.net/v3/info/release_names</a>\n</p>\n"
+        name: release_name
+        required: true
+        schema:
+          type:
+          - string
+          - "null"
+          default: jdk-11.0.6+10
+        in: path
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      responses:
+        "307":
+          description: link to checksum of the release that matches your current query
+        "400":
+          description: bad input parameter
+        "404":
+          description: No matching signature found
+  /v3/info/available_releases:
+    get:
+      summary: Returns information about available releases
+      operationId: getAvailableReleases
+      tags:
+      - Release Info
+      responses:
+        "200":
+          description: Available release information
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - available_releases
+                - available_lts_releases
+                properties:
+                  most_recent_lts:
+                    type: integer
+                    format: int32
+                    examples:
+                    - 11
+                    description: The highest LTS version for which adopt have produced
+                      a ga release
+                  most_recent_feature_release:
+                    type: integer
+                    format: int32
+                    examples:
+                    - 13
+                    description: The highest version (LTS or not) for which adopt
+                      have produced a ga release
+                  tip_version:
+                    type: integer
+                    format: int32
+                    examples:
+                    - 15
+                    description: The version that is currently in development at openjdk
+                  most_recent_feature_version:
+                    type: integer
+                    format: int32
+                    examples:
+                    - 15
+                    description: "The highest version (LTS or not) for which we have\
+                      \ produced a build, this may be a version that has not yet produced\
+                      \ a ga release"
+                  available_lts_releases:
+                    type: array
+                    examples:
+                    - - 8
+                      - 11
+                    items:
+                      type: integer
+                      format: int32
+                    description: The LTS versions for which adopt have produced a
+                      ga release
+                  available_releases:
+                    type: array
+                    examples:
+                    - - 8
+                      - 9
+                      - 10
+                      - 11
+                      - 12
+                      - 13
+                      - 14
+                    items:
+                      type: integer
+                      format: int32
+                    description: The versions for which adopt have produced a ga release
+  /v3/info/release_names:
+    get:
+      summary: Returns a list of all release names
+      operationId: getReleaseNames
+      tags:
+      - Release Info
+      parameters:
+      - description: Architecture
+        name: architecture
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Heap Size
+        name: heap_size
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Include only LTS releases
+        name: lts
+        required: false
+        in: query
+        schema:
+          type:
+          - boolean
+          - "null"
+      - description: Operating System
+        name: os
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: Pagination page number
+        name: page
+        required: false
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 0
+        in: query
+      - description: Pagination page size
+        name: page_size
+        required: false
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 10
+          maximum: 20
+        in: query
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      - description: |2
+
+          <p>Type of release. Either a release version, known as General Availability(ga) or an Early Access(ea) </p>
+        name: release_type
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ReleaseType"
+          - {}
+      - description: Indicates that any version arguments provided in this request
+          were Adoptium semantic versions
+        name: semver
+        required: false
+        schema:
+          type:
+          - boolean
+          - "null"
+          default: false
+        in: query
+      - description: Result sort method
+        name: sort_method
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/SortMethod"
+          - {}
+      - description: Result sort order
+        name: sort_order
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/SortOrder"
+          - {}
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      - description: |2
+
+          Java version range (maven style) of versions to include.
+
+          e.g:
+          * `11.0.4.1+11.1`
+          * `[1.0,2.0)`
+          * `(,1.0]`
+
+          Details of maven version ranges can be found at
+              <https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html>
+        name: version
+        required: false
+        in: query
+        schema:
+          type:
+          - string
+          - "null"
+      responses:
+        "200":
+          description: A list of all release names
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - releases
+                properties:
+                  releases:
+                    type: array
+                    items:
+                      type: string
+  /v3/info/release_notes/{release_name}:
+    get:
+      summary: Returns release notes for a release version
+      operationId: getReleaseNotes
+      tags:
+      - Release Info
+      parameters:
+      - description: "\n<p>\n    Name of the release as displayed in github or <a\
+          \ href=\"https://adoptopenjdk.net/\">https://adoptopenjdk.net/</a> e.g\n\
+          \    <code>jdk-11.0.4+11, jdk8u172-b00-201807161800</code>.\n</p>\n<p>\n\
+          \    A list of release names can be obtained from \n    <a href=\"https://api.adoptium.net/v3/info/release_names\"\
+          >https://api.adoptium.net/v3/info/release_names</a>\n</p>\n"
+        name: release_name
+        required: true
+        schema:
+          type:
+          - string
+          - "null"
+          default: jdk-19.0.2+7
+        in: path
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      responses:
+        "200":
+          description: Release notes for the provided release
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - version_data
+                - id
+                - release_name
+                - release_notes
+                properties:
+                  release_name:
+                    type: string
+                  release_notes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ReleaseNote"
+                  vendor:
+                    $ref: "#/components/schemas/Vendor"
+                  id:
+                    type: string
+                  version_data:
+                    $ref: "#/components/schemas/VersionData"
+  /v3/info/release_versions:
+    get:
+      summary: Returns a list of all release versions
+      operationId: getReleaseVersions
+      tags:
+      - Release Info
+      parameters:
+      - description: Architecture
+        name: architecture
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Heap Size
+        name: heap_size
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Include only LTS releases
+        name: lts
+        required: false
+        in: query
+        schema:
+          type:
+          - boolean
+          - "null"
+      - description: Operating System
+        name: os
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: Pagination page number
+        name: page
+        required: false
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 0
+        in: query
+      - description: Pagination page size
+        name: page_size
+        required: false
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 10
+          maximum: 50
+        in: query
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      - description: |2
+
+          <p>Type of release. Either a release version, known as General Availability(ga) or an Early Access(ea) </p>
+        name: release_type
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ReleaseType"
+          - {}
+      - description: Indicates that any version arguments provided in this request
+          were Adoptium semantic versions
+        name: semver
+        required: false
+        schema:
+          type:
+          - boolean
+          - "null"
+          default: false
+        in: query
+      - description: Result sort method
+        name: sort_method
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/SortMethod"
+          - {}
+      - description: Result sort order
+        name: sort_order
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/SortOrder"
+          - {}
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: false
+        in: query
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      - description: |2
+
+          Java version range (maven style) of versions to include.
+
+          e.g:
+          * `11.0.4.1+11.1`
+          * `[1.0,2.0)`
+          * `(,1.0]`
+
+          Details of maven version ranges can be found at
+              <https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html>
+        name: version
+        required: false
+        in: query
+        schema:
+          type:
+          - string
+          - "null"
+      responses:
+        "200":
+          description: A list of all release versions
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - versions
+                properties:
+                  versions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/VersionData"
+  /v3/installer/latest/{feature_version}/{release_type}/{os}/{arch}/{image_type}/{jvm_impl}/{heap_size}/{vendor}:
+    get:
+      summary: Redirects to the installer that matches your current query
+      description: Redirects to the installer that matches your current query
+      operationId: getInstaller
+      tags:
+      - Installer
+      parameters:
+      - description: Architecture
+        name: arch
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: "\n<p>\n    Feature release version you wish to download. Feature\
+          \ versions are whole numbers e.g. <code>8,11,16,17,18</code>.\n</p>\n<p>\n\
+          \    Available Feature versions can be obtained from \n    <a href=\"https://api.adoptium.net/v3/info/available_releases\"\
+          >https://api.adoptium.net/v3/info/available_releases</a>\n</p>\n"
+        name: feature_version
+        required: true
+        schema:
+          type:
+          - integer
+          - "null"
+          default: 8
+        in: path
+      - description: Heap Size
+        name: heap_size
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Operating System
+        name: os
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: |2
+
+          <p>Type of release. Either a release version, known as General Availability(ga) or an Early Access(ea) </p>
+        name: release_type
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ReleaseType"
+          - {}
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      responses:
+        "307":
+          description: link to installer that matches your current query
+        "400":
+          description: bad input parameter
+        "404":
+          description: No matching installer found
+  /v3/installer/version/{release_name}/{os}/{arch}/{image_type}/{jvm_impl}/{heap_size}/{vendor}:
+    get:
+      summary: Redirects to the installer that matches your current query
+      description: Redirects to the installer that matches your current query
+      operationId: getInstallerByVersion
+      tags:
+      - Installer
+      parameters:
+      - description: Architecture
+        name: arch
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: Heap Size
+        name: heap_size
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Operating System
+        name: os
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: "\n<p>\n    Name of the release as displayed in github or <a\
+          \ href=\"https://adoptopenjdk.net/\">https://adoptopenjdk.net/</a> e.g\n\
+          \    <code>jdk-11.0.4+11, jdk8u172-b00-201807161800</code>.\n</p>\n<p>\n\
+          \    A list of release names can be obtained from \n    <a href=\"https://api.adoptium.net/v3/info/release_names\"\
+          >https://api.adoptium.net/v3/info/release_names</a>\n</p>\n"
+        name: release_name
+        required: true
+        schema:
+          type:
+          - string
+          - "null"
+          default: jdk-11.0.6+10
+        in: path
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      responses:
+        "307":
+          description: link to installer that matches your current query
+        "400":
+          description: bad input parameter
+        "404":
+          description: No matching installer found
+  /v3/signature/version/{release_name}/{os}/{arch}/{image_type}/{jvm_impl}/{heap_size}/{vendor}:
+    get:
+      summary: Redirects to the signature of the release that matches your current
+        query
+      description: Redirects to the signature of the release that matches your current
+        query
+      operationId: getSignatureByVersion
+      tags:
+      - Signature
+      parameters:
+      - description: Architecture
+        name: arch
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/Architecture"
+          - {}
+      - description: Heap Size
+        name: heap_size
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/HeapSize"
+          - {}
+      - description: Image Type
+        name: image_type
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/ImageType"
+          - {}
+      - description: JVM Implementation
+        name: jvm_impl
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/JvmImpl"
+      - description: Operating System
+        name: os
+        required: true
+        in: path
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/OperatingSystem"
+          - {}
+      - description: "\n<p>\n    Name of the release as displayed in github or <a\
+          \ href=\"https://adoptopenjdk.net/\">https://adoptopenjdk.net/</a> e.g\n\
+          \    <code>jdk-11.0.4+11, jdk8u172-b00-201807161800</code>.\n</p>\n<p>\n\
+          \    A list of release names can be obtained from \n    <a href=\"https://api.adoptium.net/v3/info/release_names\"\
+          >https://api.adoptium.net/v3/info/release_names</a>\n</p>\n"
+        name: release_name
+        required: true
+        schema:
+          type:
+          - string
+          - "null"
+          default: jdk-11.0.6+10
+        in: path
+      - description: <p>Vendor of the binary. This is the organisation that produced
+          the binary package.</p>
+        name: vendor
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/Vendor"
+      - description: "C Lib type, typically would imply image_type has been set to\
+          \ staticlibs"
+        name: c_lib
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/CLib"
+          - {}
+      - description: Project
+        name: project
+        required: false
+        in: query
+        schema:
+          allOf:
+          - $ref: "#/components/schemas/project"
+          - {}
+      responses:
+        "307":
+          description: link to signature of the release that matches your current
+            query
+        "400":
+          description: bad input parameter
+        "404":
+          description: No matching signature found
+  /v3/types/architectures:
+    get:
+      summary: Returns names of architectures
+      operationId: getArchitectures
+      tags:
+      - Types
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /v3/types/operating_systems:
+    get:
+      summary: Returns names of operating systems
+      operationId: getOperatingSystems
+      tags:
+      - Types
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /v3/version/{version}:
+    get:
+      summary: Parses a java version string
+      description: Parses a java version string and returns that data in a structured
+        format
+      operationId: parseVersion
+      tags:
+      - Version
+      parameters:
+      - description: Version
+        name: version
+        required: true
+        in: path
+        schema:
+          type:
+          - string
+          - "null"
+      responses:
+        "400":
+          description: bad input parameter

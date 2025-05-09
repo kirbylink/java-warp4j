@@ -1,0 +1,12 @@
+@ECHO OFF
+SETLOCAL
+
+SET "JAVA_DIST=%s"
+SET "JAR=%s"
+
+SET "JAVA=%%~dp0\%%JAVA_DIST%%\bin\java.exe"
+SET "JAR_PATH=%%~dp0\%%JAR%%"
+
+"%%JAVA%%" %s -jar "%%JAR_PATH%%" %%*
+PAUSE > NUL
+EXIT /B %%ERRORLEVEL%%

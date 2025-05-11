@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2025-05-11
+## [v1.0.0] - 2025-05-11
 ### Added
 - Download missing Warp-Packer for current system if supported
 - Add additional Java modules to the JRE optimization process
@@ -31,4 +31,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Supports optimization of different Java versions
 
 [unreleased]: https://github.com/kirbylink/java-warp4j/compare/main...HEAD
-[1.0.0]: https://github.com/kirbylink/java-warp4j/releases/tag/1.0.0
+[v1.0.0]: https://github.com/kirbylink/java-warp4j/releases/tag/v1.0.0

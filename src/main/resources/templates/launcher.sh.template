@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Set directory and java path
+JAVA_DIST='%s'
+JAR='%s'
+
+# Set path (get directory of the script)
+DIR="$(cd "$(dirname "$0")" ; pwd -P)"
+JAVA="$DIR/$JAVA_DIST/bin/%s"
+JAR_PATH="$DIR/$JAR"
+
+# Start application
+exec "$JAVA" %s -jar "$JAR_PATH" "$@"

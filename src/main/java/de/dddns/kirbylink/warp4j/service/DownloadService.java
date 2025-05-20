@@ -49,6 +49,7 @@ public class DownloadService {
         log.info("Warp Packer already exists and up to date: {}", warpPackerPath);
         return;
       }
+      log.info("Warp Packer found but version is incompatible with application.");
     }
 
     var warpPackerUrl = Warp4JConfiguration.getWarpUrl(architecture, platform);

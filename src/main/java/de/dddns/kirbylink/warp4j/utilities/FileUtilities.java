@@ -8,6 +8,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.math.BigInteger;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
@@ -312,6 +315,16 @@ public class FileUtilities {
       log.warn(message);
       log.debug(message, e);
       return null;
+    }
+  }
+  
+  public static String calculateSha256Hash(Path file) throws IOException {
+    try {
+      var data = Files.readAllBytes(file);
+      var hash = MessageDigest.getInstance("SHA-256").digest(data);
+      return new BigInteger(1, hash).toString(16);
+    } catch (NoSuchAlgorithmException e) {
+      return "";
     }
   }
 

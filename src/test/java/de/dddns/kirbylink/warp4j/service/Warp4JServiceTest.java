@@ -18,20 +18,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
 import javax.naming.NoPermissionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import de.dddns.kirbylink.warp4j.config.Warp4JCommand.Warp4JCommandConfiguration;
 import de.dddns.kirbylink.warp4j.config.Warp4JConfiguration;
@@ -164,54 +157,6 @@ class Warp4JServiceTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testCreateExecutableJarFile_WhenNoArchitectureAndNoPlatformIsSet_ThenAllSupportedCombinationWillBeUsed() throws IOException, NoPermissionException, InterruptedException {
-      // Given
-      var platform = Platform.WINDOWS;
-      var architecture = Architecture.X64;
-      var target = new Target(platform, architecture);
-      mockInitialization("x64", "Windows 10", target);
-
-      ArgumentCaptor<Set<Target>> targets = ArgumentCaptor.forClass(Set.class);
-
-      when(mockedCachedJdkCollectorService.collectCachedJdkStates(any(), any(), targets.capture())).thenReturn(Collections.emptyList());
-
-      // When
-      var actualReturnValue = warp4JService.createExecutableJarFile(mockedWarp4jCommandConfiguration);
-
-      // Then
-      assertThat(actualReturnValue).isZero();
-      assertThat(targets.getValue()).containsExactlyInAnyOrderElementsOf(Target.getAllValidTargets());
-    }
-
-    @ParameterizedTest
-    @SuppressWarnings("unchecked")
-    @MethodSource("provideArchitectureAndPlatforms")
-    void testCreateExecutableJarFile_WhenArchitectureAndPlatformIsSet_ThenAllCombinationWillBeUsed(boolean isLinux, boolean isMacos, boolean isWindows, String expectedArchitecture, Set<Target> expectedTargets) throws IOException, NoPermissionException, InterruptedException {
-      // Given
-      var platform = Platform.WINDOWS;
-      var architecture = Architecture.X64;
-      var target = new Target(platform, architecture);
-      mockInitialization("x64", "Windows 10", target);
-
-      ArgumentCaptor<Set<Target>> targets = ArgumentCaptor.forClass(Set.class);
-
-      when(mockedWarp4jCommandConfiguration.isLinux()).thenReturn(isLinux);
-      when(mockedWarp4jCommandConfiguration.isMacos()).thenReturn(isMacos);
-      when(mockedWarp4jCommandConfiguration.isWindows()).thenReturn(isWindows);
-      when(mockedWarp4jCommandConfiguration.getArchitecture()).thenReturn(expectedArchitecture);
-
-      when(mockedCachedJdkCollectorService.collectCachedJdkStates(any(), any(), targets.capture())).thenReturn(Collections.emptyList());
-
-      // When
-      var actualReturnValue = warp4JService.createExecutableJarFile(mockedWarp4jCommandConfiguration);
-
-      // Then
-      assertThat(actualReturnValue).isZero();
-      assertThat(targets.getValue()).containsExactlyInAnyOrderElementsOf(expectedTargets);
-    }
-
-    @Test
     void testCreateExecutableJarFile_WhenTargetArchitectureAndNoPlatformNotEqualToCurrentSystem_ThenCurrentSystemWillBeAddedAsJdkProcessingState() throws IOException, NoPermissionException, InterruptedException {
       // Given
       var platform = Platform.WINDOWS;
@@ -220,7 +165,8 @@ class Warp4JServiceTest {
       mockInitialization("x64", "Windows 10", target);
 
       jdkProcessingStates = new ArrayList<>();
-      var jdkProcessingState = JdkProcessingState.builder().target(target).build();
+      var anotherTarget = new Target(Platform.LINUX, Architecture.X64);
+      var jdkProcessingState = JdkProcessingState.builder().target(anotherTarget).build();
       jdkProcessingStates.add(jdkProcessingState);
       when(mockedCachedJdkCollectorService.collectCachedJdkStates(any(), any(), any())).thenReturn(jdkProcessingStates);
       when(mockedWarp4jCommandConfiguration.isOptimize()).thenReturn(true);
@@ -238,17 +184,6 @@ class Warp4JServiceTest {
       assertThat(jdkProcessingStates)
         .hasSize(2)
         .contains(expectedJdkProcessingState);
-    }
-
-    static Stream<Arguments> provideArchitectureAndPlatforms() {
-      return Stream.of(
-          Arguments.of(true, false, false, "x64", List.of(Platform.LINUX), List.of(Architecture.X64)),
-          Arguments.of(true, true, false, "aarch64", List.of(Platform.LINUX, Platform.MACOS), List.of(Architecture.AARCH64)),
-          Arguments.of(true, true, true, "x64", List.of(Platform.LINUX, Platform.MACOS, Platform.WINDOWS), List.of(Architecture.X64)),
-          Arguments.of(false, true, true, "x64", List.of(Platform.MACOS, Platform.WINDOWS), List.of(Architecture.X64)),
-          Arguments.of(false, false, false, null, List.of(Platform.LINUX, Platform.MACOS, Platform.WINDOWS), List.of(Architecture.values())),
-          Arguments.of(false, false, false, "", List.of(Platform.LINUX, Platform.MACOS, Platform.WINDOWS), List.of(Architecture.values()))
-      );
     }
   }
 

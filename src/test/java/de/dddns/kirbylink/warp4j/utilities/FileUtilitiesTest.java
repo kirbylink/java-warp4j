@@ -325,6 +325,22 @@ class FileUtilitiesTest {
       assertThat(entries).contains("com/example/MyClass.class");
     }
   }
+  
+  @Test
+  void testCalculateSha256Hash_WhenPathExists_ThenHashWillBeCalculated() throws IOException {
+    // Given
+    var temporaryFile = temporaryDirectory.resolve("test.txt");
+    var data = "HelloWorld".getBytes();
+    Files.write(temporaryFile, data);
+    var expectedHash = "872e4e50ce9990d8b041330c47c9ddd11bec6b503ae9386a99da8584e9bb12c4";
+    
+    // When
+    var actualHash = FileUtilities.calculateSha256Hash(temporaryFile);
+    
+    // Then
+    assertThat(actualHash).isEqualTo(expectedHash);
+    
+  }
 
   private void createJarFile(Path jarFileWithModuleInfoClass) throws IOException {
     try (var jarOutputStream = new JarOutputStream(Files.newOutputStream(jarFileWithModuleInfoClass))) {
@@ -337,7 +353,6 @@ class FileUtilitiesTest {
       jarOutputStream.closeEntry();
     }
   }
-
 
   private static Path createTestZip(Path directory) throws IOException {
     var zipFile = directory.resolve("test.zip");

@@ -36,17 +36,19 @@ public class DownloadService {
     var platform = Platform.fromSystemPropertyOsName(Warp4JConfiguration.getOsName());
     log.info("Check if Warp Packer needs to be downloaded...");
     
-    var currentHash = FileUtilities.calculateSha256Hash(warpPackerPath);
-    var warpPackerPropertyName =  "warp.%s.%s".formatted(platform.getValue().toLowerCase(), architecture.getValue().toLowerCase());
-    var expectedHash = Warp4JResources.get(warpPackerPropertyName);
-    
-    log.debug("Current hash of warp-packer: {}", currentHash);
-    log.debug("Property name for needed warp-packer: {}", warpPackerPropertyName);
-    log.debug("Expected hash of warp-packer: {}", expectedHash);
-
-    if (Files.exists(warpPackerPath) && currentHash.equals(expectedHash)) {
-      log.info("Warp Packer already exists and up to date: {}", warpPackerPath);
-      return;
+    if (Files.exists(warpPackerPath)) {
+      var currentHash = FileUtilities.calculateSha256Hash(warpPackerPath);
+      var warpPackerPropertyName =  "warp.%s.%s".formatted(platform.getValue().toLowerCase(), architecture.getValue().toLowerCase());
+      var expectedHash = Warp4JResources.get(warpPackerPropertyName);
+      
+      log.debug("Current hash of warp-packer: {}", currentHash);
+      log.debug("Property name for needed warp-packer: {}", warpPackerPropertyName);
+      log.debug("Expected hash of warp-packer: {}", expectedHash);      
+      
+      if (currentHash.equals(expectedHash)) {
+        log.info("Warp Packer already exists and up to date: {}", warpPackerPath);
+        return;
+      }
     }
 
     var warpPackerUrl = Warp4JConfiguration.getWarpUrl(architecture, platform);

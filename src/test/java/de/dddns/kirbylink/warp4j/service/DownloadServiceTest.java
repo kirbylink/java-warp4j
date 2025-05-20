@@ -20,11 +20,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import de.dddns.kirbylink.warp4j.config.Warp4JConfiguration;
+import de.dddns.kirbylink.warp4j.config.Warp4JResources;
 import de.dddns.kirbylink.warp4j.model.AvailableReleaseVersion;
 import de.dddns.kirbylink.warp4j.model.ReleaseVersionsResponse;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.AdoptiumClient;
 import de.dddns.kirbylink.warp4j.utilities.DownloadUtilities;
+import de.dddns.kirbylink.warp4j.utilities.FileUtilities;
 
 class DownloadServiceTest {
 
@@ -34,6 +36,8 @@ class DownloadServiceTest {
 
   private static MockedStatic<Files> mockedFiles;
   private static MockedStatic<Warp4JConfiguration> mockedWarp4JConfiguration;
+  private static MockedStatic<FileUtilities> mockedFileUtilities;
+  private static MockedStatic<Warp4JResources> mockedWarp4JResources;
 
   @BeforeEach
   void setUp() {
@@ -42,12 +46,16 @@ class DownloadServiceTest {
     downloadService = new DownloadService(downloadUtilities, adoptiumClient);
     mockedFiles = mockStatic(Files.class);
     mockedWarp4JConfiguration = mockStatic(Warp4JConfiguration.class);
+    mockedFileUtilities = mockStatic(FileUtilities.class);
+    mockedWarp4JResources = mockStatic(Warp4JResources.class);
   }
 
   @AfterEach
   void tearDown() {
     mockedFiles.close();
     mockedWarp4JConfiguration.close();
+    mockedFileUtilities.close();
+    mockedWarp4JResources.close();
   }
 
   @Test
@@ -164,6 +172,42 @@ class DownloadServiceTest {
     // Then
     assertThat(actualVersionData).usingRecursiveComparison().isEqualTo(expectedVersionData);
   }
+  
+  @Test
+  void testDownloadWarpPackerIfNeeded_WhenFileDoesNotExists_DoesDownload() throws Exception {
+    // Given
+    var mockPath = mock(Path.class);
+    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(false);
+    mockedWarp4JConfiguration.when(Warp4JConfiguration::getArchitecture).thenReturn("x64");
+    mockedWarp4JConfiguration.when(Warp4JConfiguration::getOsName).thenReturn("windows");
+    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(false);
+    mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getWarpUrl(any(), any())).thenReturn("http://example.org");
+    
+    // When
+    downloadService.downloadWarpPackerIfNeeded(mockPath);
+    
+    // Then
+    verify(downloadUtilities).downloadFile(any(), any());
+  }
+  
+  @Test
+  void testDownloadWarpPackerIfNeeded_WhenFileAlreadyExistsButWrongVersion_DoesDownload() throws Exception {
+    // Given
+    var mockPath = mock(Path.class);
+    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(false);
+    mockedWarp4JConfiguration.when(Warp4JConfiguration::getArchitecture).thenReturn("x64");
+    mockedWarp4JConfiguration.when(Warp4JConfiguration::getOsName).thenReturn("windows");
+    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(true);
+    mockedFileUtilities.when(() -> FileUtilities.calculateSha256Hash(mockPath)).thenReturn("currentHash");
+    mockedWarp4JResources.when(() -> Warp4JResources.get(any())).thenReturn("expectedHash");
+    mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getWarpUrl(any(), any())).thenReturn("http://example.org");
+    
+    // When
+    downloadService.downloadWarpPackerIfNeeded(mockPath);
+    
+    // Then
+    verify(downloadUtilities).downloadFile(any(), any());
+  }
 
   @Test
   void testDownloadWarpPackerIfNeeded_WhenFileAlreadyExists_DoesNotDownload() throws Exception {
@@ -172,7 +216,8 @@ class DownloadServiceTest {
     mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(true);
     mockedWarp4JConfiguration.when(Warp4JConfiguration::getArchitecture).thenReturn("x64");
     mockedWarp4JConfiguration.when(Warp4JConfiguration::getOsName).thenReturn("linux");
-    mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getWarpUrl(any(), any())).thenReturn("http://example.org");
+    mockedFileUtilities.when(() -> FileUtilities.calculateSha256Hash(mockPath)).thenReturn("expectedHash");
+    mockedWarp4JResources.when(() -> Warp4JResources.get(any())).thenReturn("expectedHash");
 
     // When
     downloadService.downloadWarpPackerIfNeeded(mockPath);

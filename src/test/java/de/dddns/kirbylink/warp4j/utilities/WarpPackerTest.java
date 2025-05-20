@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.utilities.ProcessExecutor.ExecutionResult;
 
 class WarpPackerTest {
@@ -35,8 +36,7 @@ class WarpPackerTest {
   void testWarpApplication_ShouldExecuteWarpPacker() throws IOException, InterruptedException {
     // Given
     var warpPackerPath = tempDir.resolve("warp-packer");
-    var platform = Platform.LINUX;
-    var architecture = Architecture.X64;
+    var target = new Target(Platform.LINUX, Architecture.X64);
     var bundlePath = tempDir.resolve("bundle");
     var scriptName = "start.sh";
     var outputPath = tempDir.resolve("output");
@@ -51,7 +51,7 @@ class WarpPackerTest {
     when(processExecutor.execute(anyList())).thenReturn(mockResult);
 
     // When
-    warpPacker.warpApplication(warpPackerPath, platform, architecture, bundlePath, scriptName, outputPath, prefix);
+    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix);
 
     // Then
     verify(processExecutor).execute(expectedCommand);
@@ -61,8 +61,7 @@ class WarpPackerTest {
   void testWarpApplication_WithPrefixShouldExecuteWarpPacker() throws IOException, InterruptedException {
     // Given
     var warpPackerPath = tempDir.resolve("warp-packer");
-    var platform = Platform.LINUX;
-    var architecture = Architecture.X64;
+    var target = new Target(Platform.LINUX, Architecture.X64);
     var bundlePath = tempDir.resolve("bundle");
     var scriptName = "start.sh";
     var outputPath = tempDir.resolve("output");
@@ -78,7 +77,7 @@ class WarpPackerTest {
     when(processExecutor.execute(anyList())).thenReturn(mockResult);
 
     // When
-    warpPacker.warpApplication(warpPackerPath, platform, architecture, bundlePath, scriptName, outputPath, prefix);
+    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix);
 
     // Then
     verify(processExecutor).execute(expectedCommand);
@@ -88,8 +87,7 @@ class WarpPackerTest {
   void testWarpApplication_ShouldThrowExceptionOnFailure() throws IOException, InterruptedException {
     // Given
     var warpPackerPath = tempDir.resolve("warp-packer");
-    var platform = Platform.LINUX;
-    var architecture = Architecture.X64;
+    var target = new Target(Platform.LINUX, Architecture.X64);
     var bundlePath = tempDir.resolve("bundle");
     var scriptName = "start.sh";
     var outputPath = tempDir.resolve("output");
@@ -105,7 +103,7 @@ class WarpPackerTest {
 
     // When
     var exception = assertThrows(RuntimeException.class, () ->
-    warpPacker.warpApplication(warpPackerPath, platform, architecture, bundlePath, scriptName, outputPath, prefix));
+    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix));
 
     // Then
     assertThat(exception.getMessage()).isEqualTo("Failed to optimize runtime");

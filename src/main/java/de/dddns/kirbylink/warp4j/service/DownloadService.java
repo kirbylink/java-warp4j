@@ -11,9 +11,9 @@ import java.nio.file.Path;
 import javax.naming.NoPermissionException;
 import de.dddns.kirbylink.warp4j.config.Warp4JConfiguration;
 import de.dddns.kirbylink.warp4j.config.Warp4JResources;
-import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.JavaVersion;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.AdoptiumClient;
 import de.dddns.kirbylink.warp4j.utilities.DownloadUtilities;
@@ -31,20 +31,18 @@ public class DownloadService {
   private final DownloadUtilities downloadUtilities;
   private final AdoptiumClient adoptiumClient;
 
-  public void downloadWarpPackerIfNeeded(Path warpPackerPath) throws NoPermissionException, IOException {
-    var architecture = Architecture.fromValue(Warp4JConfiguration.getArchitecture());
-    var platform = Platform.fromSystemPropertyOsName(Warp4JConfiguration.getOsName());
+  public void downloadWarpPackerIfNeeded(Path warpPackerPath, Target target) throws NoPermissionException, IOException {
     log.info("Check if Warp Packer needs to be downloaded...");
-    
+
     if (Files.exists(warpPackerPath)) {
       var currentHash = FileUtilities.calculateSha256Hash(warpPackerPath);
-      var warpPackerPropertyName =  "warp.%s.%s".formatted(platform.getValue().toLowerCase(), architecture.getValue().toLowerCase());
+      var warpPackerPropertyName =  "warp.%s.%s".formatted(target.getPlatform().getValue().toLowerCase(), target.getArchitecture().getValue().toLowerCase());
       var expectedHash = Warp4JResources.get(warpPackerPropertyName);
-      
+
       log.debug("Current hash of warp-packer: {}", currentHash);
       log.debug("Property name for needed warp-packer: {}", warpPackerPropertyName);
-      log.debug("Expected hash of warp-packer: {}", expectedHash);      
-      
+      log.debug("Expected hash of warp-packer: {}", expectedHash);
+
       if (currentHash.equals(expectedHash)) {
         log.info("Warp Packer already exists and up to date: {}", warpPackerPath);
         return;
@@ -52,13 +50,13 @@ public class DownloadService {
       log.info("Warp Packer found but version is incompatible with application.");
     }
 
-    var warpPackerUrl = Warp4JConfiguration.getWarpUrl(architecture, platform);
+    var warpPackerUrl = Warp4JConfiguration.getWarpUrl(target);
 
-    log.info("Download Warp Packer from {} for current platform and architecture.", warpPackerUrl);
+    log.info("Download Warp Packer from {} for current target.getPlatform() and target.getArchitecture().", warpPackerUrl);
 
     downloadUtilities.downloadFile(new URL(warpPackerUrl), warpPackerPath);
 
-    if (!platform.equals(Platform.WINDOWS)) {
+    if (!target.getPlatform().equals(Platform.WINDOWS)) {
       var isExecuteable = warpPackerPath.toFile().setExecutable(true);
       if (!isExecuteable) {
         throw new NoPermissionException("Can not set executable flag for warp-packer");
@@ -106,27 +104,27 @@ public class DownloadService {
     return versionDataLatest;
   }
 
-  public boolean downloadJdk(Platform platform, Architecture architecture, VersionData versionData, Path applicationDataDirectoryPath) {
-    log.info("Download JDK version {} for {} with architecture {}", versionData.getMajor(), platform, architecture);
+  public boolean downloadJdk(Target target, VersionData versionData, Path applicationDataDirectoryPath) {
+    log.info("Download JDK version {} for {} with target.getArchitecture() {}", versionData.getMajor(), target.getPlatform(), target.getArchitecture());
     try {
-      var adoptiumJavaDownloadUrl = adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(versionData, architecture, platform);
+      var adoptiumJavaDownloadUrl = adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(versionData, target);
 
       if (null == adoptiumJavaDownloadUrl) {
-        var message = format("Could not download JDK for %s with architecture %s. Skipping further processing for this combination.", platform, architecture);
+        var message = format("Could not download JDK for %s with target.getArchitecture() %s. Skipping further processing for this combination.", target.getPlatform(), target.getArchitecture());
         log.warn(message);
         return false;
       }
 
       log.debug("Try to download {}", adoptiumJavaDownloadUrl);
-      var applicationDataJdkDirectoryPath = applicationDataDirectoryPath.resolve(APPLICATION_DATA_JDK_DIRECTORY).resolve(platform.getValue()).resolve(architecture.getValue());
+      var applicationDataJdkDirectoryPath = applicationDataDirectoryPath.resolve(APPLICATION_DATA_JDK_DIRECTORY).resolve(target.getPlatform().getValue()).resolve(target.getArchitecture().getValue());
       Files.createDirectories(applicationDataJdkDirectoryPath);
-      var jdkCompressedFilePath = applicationDataJdkDirectoryPath.resolve(platform.equals(Platform.WINDOWS) ? JDK_ZIP : JDK_TAR_GZ);
+      var jdkCompressedFilePath = applicationDataJdkDirectoryPath.resolve(target.getPlatform().equals(Platform.WINDOWS) ? JDK_ZIP : JDK_TAR_GZ);
 
       downloadUtilities.downloadFile(new URL(adoptiumJavaDownloadUrl), jdkCompressedFilePath);
 
       return true;
     } catch (Exception e) {
-      var message = format("Could not download JDK for %s with architecture %s. Skipping further processing for this combination. Reason: %s", platform, architecture, e.getMessage());
+      var message = format("Could not download JDK for %s with target.getArchitecture() %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return false;

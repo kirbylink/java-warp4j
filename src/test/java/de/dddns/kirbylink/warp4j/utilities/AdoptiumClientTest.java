@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.Release;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 
@@ -130,9 +131,10 @@ class AdoptiumClientTest {
             """;
     mockSuccessfulResponse(jsonResponse);
     var expectedDownloadUrl = "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.13%2B11/OpenJDK17U-jdk_x64_mac_hotspot_17.0.13_11.tar.gz";
+    var target = new Target(Platform.MACOS, Architecture.X64);
 
     // When
-    var actualDownloadUrl = adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(versionData, Architecture.X64, Platform.MACOS);
+    var actualDownloadUrl = adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(versionData, target);
 
     // Then
     assertThat(actualDownloadUrl).isEqualTo(expectedDownloadUrl);
@@ -230,9 +232,10 @@ class AdoptiumClientTest {
     versionDataSpecific.setMinor(0);
     versionDataSpecific.setSecurity(5);
     versionDataSpecific.setBuild(8);
+    var target = new Target(Platform.LINUX, Architecture.X64);
 
     // When
-    var actualDownloadUrl = adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(versionData, Architecture.X64, Platform.LINUX);
+    var actualDownloadUrl = adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(versionData, target);
 
     // Then
     assertThat(actualDownloadUrl).isEqualTo(expectedDownloadUrl);
@@ -242,9 +245,10 @@ class AdoptiumClientTest {
   void testGetDownloadUrlForSpecificJavaVersionDataAndSystem_WhenApiAssetsFeatureReleasesNotExists_ThenNullIsReturned() throws IOException, InterruptedException {
     // Given
     mockErrorResponse(404);
+    var target = new Target(Platform.MACOS, Architecture.X64);
 
     // When
-    var actualDownloadUrl = adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(versionData, Architecture.X64, Platform.MACOS);
+    var actualDownloadUrl = adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(versionData, target);
 
     // Then
     assertThat(actualDownloadUrl).isNull();

@@ -317,7 +317,7 @@ public class FileUtilities {
       return null;
     }
   }
-  
+
   public static String calculateSha256Hash(Path file) throws IOException {
     try {
       var data = Files.readAllBytes(file);

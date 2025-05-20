@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -101,9 +102,9 @@ public class Warp4JConfiguration {
     return format("%s%s", adoptiumUrl, path);
   }
 
-  public static String getWarpUrl(Architecture architecture, Platform platform) {
-    return switch (platform) {
-      case LINUX -> architecture.equals(Architecture.X64) ? Warp4JResources.get("warp.linux.x64.url") : Warp4JResources.get("warp.linux.aarch64.url");
+  public static String getWarpUrl(Target target) {
+    return switch (target.getPlatform()) {
+      case LINUX -> target.getArchitecture().equals(Architecture.X64) ? Warp4JResources.get("warp.linux.x64.url") : Warp4JResources.get("warp.linux.aarch64.url");
       case MACOS -> Warp4JResources.get("warp.macos.x64.url");
       case WINDOWS -> Warp4JResources.get("warp.windows.x64.url");
     };
@@ -120,33 +121,33 @@ public class Warp4JConfiguration {
     return format(Warp4JResources.getTemplate("launcher.cmd.terminal.template"), bundledDistroSubdir, jarName, jvmOptions);
   }
 
-  public static boolean supportedPlatformAndArchitectureByAdoptium(Architecture architecture, Platform platform) {
+  public static boolean supportedPlatformAndArchitectureByAdoptium(Target target) {
     var supported = false;
 
-    switch (architecture) {
-      case X32 -> supported = platform.equals(Platform.WINDOWS);
+    switch (target.getArchitecture()) {
+      case X32 -> supported = target.getPlatform().equals(Platform.WINDOWS);
       case X64 -> supported = true;
-      case ARM -> supported = platform.equals(Platform.LINUX);
+      case ARM -> supported = target.getPlatform().equals(Platform.LINUX);
       case AARCH64 -> supported = true;
     }
 
     return supported;
   }
 
-  public static boolean supportedPlatformAndArchitectureByWarp(Architecture architecture, Platform platform) {
+  public static boolean supportedPlatformAndArchitectureByWarp(Target target) {
     var supported = false;
 
-    switch (architecture) {
+    switch (target.getArchitecture()) {
       case X64 -> supported = true;
       case AARCH64 -> supported = true;
-      default -> log.debug("Unsupported architecture and platform by warp: {} and {}", architecture, platform);
+      default -> log.debug("Unsupported architecture and platform by warp: {} and {}", target.getArchitecture(), target.getPlatform());
     }
 
     return supported;
   }
 
-  public static boolean isSupportedTarget(Architecture architecture, Platform platform) {
-    return supportedPlatformAndArchitectureByAdoptium(architecture, platform) && supportedPlatformAndArchitectureByWarp(architecture, platform);
+  public static boolean isSupportedTarget(Target target) {
+    return supportedPlatformAndArchitectureByAdoptium(target) && supportedPlatformAndArchitectureByWarp(target);
   }
 
   public static Path getCachePath(String osName, String userHome) {

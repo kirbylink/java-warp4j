@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import de.dddns.kirbylink.warp4j.model.Architecture;
-import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.Warp4JRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +15,9 @@ public class WarpPacker {
 
   private final ProcessExecutor processExecutor;
 
-  public void warpApplication(Path warpPackerPath, Platform platform, Architecture architecture, Path bundlePath, String scriptName, Path outputPath, String prefix) throws IOException, InterruptedException {
+  public void warpApplication(Path warpPackerPath, Target target, Path bundlePath, String scriptName, Path outputPath, String prefix) throws IOException, InterruptedException {
     List<String> command = new ArrayList<>(List.of(warpPackerPath.toString(), "pack",
-        "--arch", platform.toString().toLowerCase() + "-" + architecture.getValue(),
+        "--arch", target.getPlatform().toString().toLowerCase() + "-" + target.getArchitecture().getValue(),
         "--input-dir", bundlePath.toString(),
         "--exec", scriptName,
         "--unique-id",

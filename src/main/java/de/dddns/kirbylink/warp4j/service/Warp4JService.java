@@ -10,7 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +21,7 @@ import de.dddns.kirbylink.warp4j.config.Warp4JConfiguration;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.JdkProcessingState;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.FileUtilities;
 import lombok.RequiredArgsConstructor;
@@ -56,8 +56,9 @@ public class Warp4JService {
     log.info("Check if current system is supported by warp-packer...");
     var currentArchitecture = Architecture.fromValue(Warp4JConfiguration.getArchitecture());
     var currentPlatform = Platform.fromSystemPropertyOsName(Warp4JConfiguration.getOsName());
+    var currentTarget = new Target(currentPlatform, currentArchitecture);
 
-    if (!supportedPlatformAndArchitectureByWarp(currentArchitecture, currentPlatform)) {
+    if (!supportedPlatformAndArchitectureByWarp(currentTarget)) {
       var message = format("Warp-Packer does not support current architecture %s and platform %s", currentArchitecture, currentPlatform);
       throw new UnsupportedOperationException(message);
     }
@@ -68,7 +69,7 @@ public class Warp4JService {
     log.info("Initialize warp-packer...");
     var warpPackerPath = Warp4JConfiguration.getWarpPackerPath(applicationDataDirectoryPath);
     try {
-      downloadService.downloadWarpPackerIfNeeded(Warp4JConfiguration.getWarpPackerPath(applicationDataDirectoryPath));
+      downloadService.downloadWarpPackerIfNeeded(Warp4JConfiguration.getWarpPackerPath(applicationDataDirectoryPath), currentTarget);
     } catch (IOException e) {
       var message = format("Warp-Packer does not exist and can not be downloaded. Internet connection needs to be checked or Warp-Packer must be available at %s", warpPackerPath.toString());
       log.warn(message);
@@ -86,7 +87,7 @@ public class Warp4JService {
     log.info("OpenJDK version {} will be used", versionDataToUse.getSemver());
 
     log.info("Collect information about cached files...");
-    var jdkProcessingStates = collectInformationAboutCachedFiles(warp4jCommandConfiguration, jarFilePath, applicationDataDirectoryPath, versionDataToUse);
+    var jdkProcessingStates = collectInformationAboutCachedFiles(warp4jCommandConfiguration, currentTarget, jarFilePath, applicationDataDirectoryPath, versionDataToUse);
 
     log.info("Download JDK if not present...");
     jdkProcessingStates = jdkProcessingStates.stream()
@@ -103,7 +104,7 @@ public class Warp4JService {
     if (warp4jCommandConfiguration.isOptimize() && versionDataToUse.getMajor() > 8) {
       log.info("Optimize JDK and copy it to bundle directory...");
       log.info("Find jlink and jdep binaries...");
-      jdkProcessingStates = optimizeJdk(jdkProcessingStates, currentArchitecture, currentPlatform, jarFilePath, applicationDataDirectoryPath, versionDataToUse);
+      jdkProcessingStates = optimizeJdk(jdkProcessingStates, currentTarget, jarFilePath, applicationDataDirectoryPath, versionDataToUse);
     }
 
     log.info("Copy optional JDK to bundle directory...");
@@ -141,41 +142,26 @@ public class Warp4JService {
     return 0;
   }
 
-  private List<JdkProcessingState> collectInformationAboutCachedFiles(Warp4JCommandConfiguration warp4jCommandConfiguration, Path jarFilePath, Path applicationDataDirectoryPath,
+  private List<JdkProcessingState> collectInformationAboutCachedFiles(Warp4JCommandConfiguration warp4jCommandConfiguration, Target currentTarget, Path jarFilePath, Path applicationDataDirectoryPath,
       VersionData versionDataToUse) {
-    var currentArchitecture = Architecture.fromValue(Warp4JConfiguration.getArchitecture());
-    var currentPlatform = Platform.fromSystemPropertyOsName(Warp4JConfiguration.getOsName());
-    var listOfArchitecture = warp4jCommandConfiguration.getArchitecture() != null && !warp4jCommandConfiguration.getArchitecture().isBlank() ? List.of(Architecture.fromValue(warp4jCommandConfiguration.getArchitecture())) : List.of(Architecture.values());
-    var listOfPlatforms = new ArrayList<Platform>();
-    if (warp4jCommandConfiguration.isLinux()) {
-      listOfPlatforms.add(Platform.LINUX);
-    }
-    if (warp4jCommandConfiguration.isMacos()) {
-      listOfPlatforms.add(Platform.MACOS);
-    }
-    if (warp4jCommandConfiguration.isWindows()) {
-      listOfPlatforms.add(Platform.WINDOWS);
-    }
 
-    if (listOfPlatforms.isEmpty()) {
-        listOfPlatforms.addAll(List.of(Platform.values()));
-    }
+    var targets = warp4jCommandConfiguration.getAllSelectedTargets();
 
-    var jdkProcessingStates = cachedJdkCollectorService.collectCachedJdkStates(applicationDataDirectoryPath, versionDataToUse, listOfArchitecture, listOfPlatforms);
+    var jdkProcessingStates = cachedJdkCollectorService.collectCachedJdkStates(applicationDataDirectoryPath, versionDataToUse, targets);
 
     log.debug("Following information are collected: {}", jdkProcessingStates.toString());
     var summary = jdkProcessingStates.stream()
-        .map(jdkProcessingState -> jdkProcessingState.platform().toString().toLowerCase() + "-" + jdkProcessingState.architecture().getValue())
+        .map(jdkProcessingState -> jdkProcessingState.target().getPlatform().toString().toLowerCase() + "-" + jdkProcessingState.target().getArchitecture().getValue())
         .toList();
     log.info("Try to warp  JAR {} for the following os and architecture: {}", jarFilePath, String.join(", ", summary));
 
     if (warp4jCommandConfiguration.isOptimize()) {
       log.info("Optimization needs an JDK for the current system. Check if one target matches the current running system...");
-      var currentSystemMatchTarget = jdkProcessingStates.stream().anyMatch(jdkProcessingState -> jdkProcessingState.architecture().equals(currentArchitecture) && jdkProcessingState.platform().equals(currentPlatform));
+      var currentSystemMatchTarget = jdkProcessingStates.stream().anyMatch(jdkProcessingState -> jdkProcessingState.target().getArchitecture().equals(currentTarget.getArchitecture()) && jdkProcessingState.target().getPlatform().equals(currentTarget.getPlatform()));
 
-      if (!currentSystemMatchTarget && isSupportedTarget(currentArchitecture, currentPlatform)) {
+      if (!currentSystemMatchTarget && isSupportedTarget(currentTarget)) {
         log.debug("Add additionally JDK for current running system to the process.");
-        var optionalAdditionalJdkProcessingState = Optional.ofNullable(cachedJdkCollectorService.collectCachedJdkState(applicationDataDirectoryPath, currentPlatform, currentArchitecture, versionDataToUse));
+        var optionalAdditionalJdkProcessingState = Optional.ofNullable(cachedJdkCollectorService.collectCachedJdkState(applicationDataDirectoryPath, currentTarget, versionDataToUse));
         if(optionalAdditionalJdkProcessingState.isPresent()) {
           var additionalJdkProcessingstate = optionalAdditionalJdkProcessingState.get().toBuilder().isTarget(false).build();
           jdkProcessingStates.add(additionalJdkProcessingstate);
@@ -187,15 +173,16 @@ public class Warp4JService {
   }
 
   private JdkProcessingState downloadJdk(JdkProcessingState jdkProcessingState, VersionData versionData, Path applicationDataDirectoryPath, boolean isPull) {
-    var platform = jdkProcessingState.platform();
-    var architecture = jdkProcessingState.architecture();
+    var target = jdkProcessingState.target();
+    var platform = target.getPlatform();
+    var architecture = target.getArchitecture();
 
     if (!jdkProcessingState.isDownloadNeeded() && !isPull) {
       log.info("Skip download because file or extracted folder (with matching major version) already exists.");
       return jdkProcessingState;
     }
 
-    var isJdkDownloaded = downloadService.downloadJdk(platform, architecture, versionData, applicationDataDirectoryPath);
+    var isJdkDownloaded = downloadService.downloadJdk(target, versionData, applicationDataDirectoryPath);
 
     if (isJdkDownloaded) {
       return jdkProcessingState.toBuilder().downloaded(true).cleanuped(false).build();
@@ -205,8 +192,7 @@ public class Warp4JService {
   }
 
   private JdkProcessingState extractJdkAndDeleteCompressedFile(JdkProcessingState jdkProcessingState, VersionData versionData, Path applicationDataDirectory, boolean isPull) {
-    var platform = jdkProcessingState.platform();
-    var architecture = jdkProcessingState.architecture();
+    var target = jdkProcessingState.target();
 
     if (null != jdkProcessingState.extractedJdkPath() && !isPull) {
       log.info("Skip extracting of compressed file because extracted folder {} already exists.", jdkProcessingState.extractedJdkPath());
@@ -222,7 +208,7 @@ public class Warp4JService {
         log.debug("Can not delete previous downloaded JDK folder. Continue process and try to override existing files.", e);
       }
     }
-    var extractedJdkPath = fileService.extractJdkAndDeleteCompressedFile(platform, architecture, versionData, applicationDataDirectory);
+    var extractedJdkPath = fileService.extractJdkAndDeleteCompressedFile(target, versionData, applicationDataDirectory);
 
     if (null != extractedJdkPath) {
       return jdkProcessingState.toBuilder()
@@ -234,9 +220,9 @@ public class Warp4JService {
     return null;
   }
 
-  private List<JdkProcessingState> optimizeJdk(List<JdkProcessingState> jdkProcessingStates, Architecture currentArchitecture, Platform currentPlatform, Path jarFilePath,
+  private List<JdkProcessingState> optimizeJdk(List<JdkProcessingState> jdkProcessingStates, Target currentTarget, Path jarFilePath,
       Path applicationDataDirectoryPath, VersionData versionData) {
-    var optionalJdkPathForCurrentSystem = findJdkForCurrentSystem(jdkProcessingStates, currentArchitecture, currentPlatform);
+    var optionalJdkPathForCurrentSystem = findJdkForCurrentSystem(jdkProcessingStates, currentTarget);
     if (optionalJdkPathForCurrentSystem.isEmpty()) {
       log.warn("No valid JDK found for current platform. Skip optimization.");
       return jdkProcessingStates;
@@ -260,9 +246,9 @@ public class Warp4JService {
         .toList();
   }
 
-  private Optional<Path> findJdkForCurrentSystem(List<JdkProcessingState> jdkProcessingStates, Architecture arch, Platform platform) {
+  private Optional<Path> findJdkForCurrentSystem(List<JdkProcessingState> jdkProcessingStates, Target currentTarget) {
     return jdkProcessingStates.stream().
-        filter(jdk -> jdk.architecture().equals(arch) && jdk.platform().equals(platform))
+        filter(jdkProcessingState -> jdkProcessingState.target().getArchitecture().equals(currentTarget.getArchitecture()) && jdkProcessingState.target().getPlatform().equals(currentTarget.getPlatform()))
         .map(JdkProcessingState::extractedJdkPath)
         .findFirst();
   }
@@ -309,12 +295,13 @@ public class Warp4JService {
   }
 
   private JdkProcessingState optimizeAndBuildJdkProcessingState(Path applicationDataDirectoryPath, VersionData versionData, Path jlinkPath, String modules, JdkProcessingState jdkProcessingState) {
-    var optimizedPath = createOptimizedRuntimes(jdkProcessingState.platform(), jdkProcessingState.architecture(), jdkProcessingState.extractedJdkPath(), jlinkPath, modules, versionData, applicationDataDirectoryPath);
+    var target = jdkProcessingState.target();
+    var optimizedPath = createOptimizedRuntimes(target, jdkProcessingState.extractedJdkPath(), jlinkPath, modules, versionData, applicationDataDirectoryPath);
     return optimizedPath != null ? jdkProcessingState.toBuilder().bundlePath(optimizedPath.getParent()).optimized(true).build(): null;
   }
 
-  public Path createOptimizedRuntimes(Platform platform, Architecture architecture, Path jmodsPath, Path jlinkPath, String modules, VersionData versionData, Path applicationDataDirectoryPath) {
-    return optimizerService.createOptimizedRuntime(platform, architecture, jmodsPath, versionData, applicationDataDirectoryPath, jlinkPath, modules);
+  public Path createOptimizedRuntimes(Target target, Path jmodsPath, Path jlinkPath, String modules, VersionData versionData, Path applicationDataDirectoryPath) {
+    return optimizerService.createOptimizedRuntime(target, jmodsPath, versionData, applicationDataDirectoryPath, jlinkPath, modules);
   }
 
   private JdkProcessingState copyJdkToBundleDirectory(JdkProcessingState jdkProcessingState, Path applicationDataDirectoryPath, VersionData versionDateToUse) {
@@ -322,9 +309,8 @@ public class Warp4JService {
       return jdkProcessingState;
     }
 
-    var platform = jdkProcessingState.platform();
-    var architecture = jdkProcessingState.architecture();
-    var bundleDirectoryPath = fileService.copyJdkToBundleDirectory(platform, architecture, applicationDataDirectoryPath, versionDateToUse);
+    var target = jdkProcessingState.target();
+    var bundleDirectoryPath = fileService.copyJdkToBundleDirectory(target, applicationDataDirectoryPath, versionDateToUse);
 
     if (null != bundleDirectoryPath) {
       return jdkProcessingState.toBuilder().bundlePath(bundleDirectoryPath).build();
@@ -333,11 +319,10 @@ public class Warp4JService {
   }
 
   private JdkProcessingState copyJarFileAndCreateLauncherScriptToBundleDirectory(JdkProcessingState jdkProcessingState, Path jarFilePath, Warp4JCommandConfiguration warp4jCommandConfiguration) {
-    var platform = jdkProcessingState.platform();
-    var architecture = jdkProcessingState.architecture();
+    var target = jdkProcessingState.target();
     var bundleDirectoryPath = jdkProcessingState.bundlePath();
 
-    var bundleScriptPath = fileService.copyJarFileAndCreateLauncherScriptToBundleDirectory(platform, architecture, bundleDirectoryPath, jarFilePath, warp4jCommandConfiguration);
+    var bundleScriptPath = fileService.copyJarFileAndCreateLauncherScriptToBundleDirectory(target, bundleDirectoryPath, jarFilePath, warp4jCommandConfiguration);
 
     if (null != bundleScriptPath) {
       return jdkProcessingState.toBuilder().bundleScriptPath(bundleScriptPath).build();
@@ -346,13 +331,14 @@ public class Warp4JService {
   }
 
   private JdkProcessingState warpBundle(JdkProcessingState jdkProcessingState, Path warpPackerPath, Path outputDirectory, String jarFileName, Warp4JCommandConfiguration warp4JCommandConfiguration) {
-    var platform = jdkProcessingState.platform();
-    var architecture = jdkProcessingState.architecture();
+    var target = jdkProcessingState.target();
+    var platform = target.getPlatform();
+    var architecture = target.getArchitecture();
     var bundleDirectoryPath = jdkProcessingState.bundlePath();
     var bundleScriptPath = jdkProcessingState.bundleScriptPath();
     var outputFilePath = outputDirectory.resolve(jarFileName + "-" + platform.getValue() + "-" + architecture.getValue() + (platform == Platform.WINDOWS ? ".exe" : ""));
     var prefix = warp4JCommandConfiguration.getPrefix();
-    var isWarped = warpService.warpBundle(platform, architecture, bundleDirectoryPath, bundleScriptPath, outputFilePath, warpPackerPath, prefix);
+    var isWarped = warpService.warpBundle(target, bundleDirectoryPath, bundleScriptPath, outputFilePath, warpPackerPath, prefix);
 
     if (isWarped) {
       return jdkProcessingState.toBuilder().success(true).bundledBinary(outputFilePath).build();
@@ -362,10 +348,9 @@ public class Warp4JService {
   }
 
   private JdkProcessingState compressBundle(JdkProcessingState jdkProcessingState) {
-    var platform = jdkProcessingState.platform();
-    var architecture = jdkProcessingState.architecture();
+    var target = jdkProcessingState.target();
     var bundledBinaryPath = jdkProcessingState.bundledBinary();
-    var isCompressed = fileService.compressBundle(platform, architecture, bundledBinaryPath);
+    var isCompressed = fileService.compressBundle(target, bundledBinaryPath);
 
     if (isCompressed) {
       return jdkProcessingState;

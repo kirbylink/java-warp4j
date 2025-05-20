@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import de.dddns.kirbylink.warp4j.config.Warp4JCommand.Warp4JCommandConfiguration;
-import de.dddns.kirbylink.warp4j.model.Architecture;
-import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.FileUtilities;
 import de.dddns.kirbylink.warp4j.utilities.JLinkOptimizer;
@@ -57,11 +56,11 @@ public class OptimizerService {
     return analyzeDependencies(jdepsPath, classPath, jarFilePath, versionData);
   }
 
-  public Path createOptimizedRuntime(Platform platform, Architecture architecture, Path jmodsPath, VersionData versionData, Path applicationDataDirectoryPath, Path jLinkPath,
+  public Path createOptimizedRuntime(Target target, Path jmodsPath, VersionData versionData, Path applicationDataDirectoryPath, Path jLinkPath,
       String modules) {
-    log.info("Creating minimal runtime for {} with architecture {}", platform, architecture);
+    log.info("Creating minimal runtime for {} with architecture {}", target.getPlatform(), target.getArchitecture());
     try {
-      return jLinkOptimizer.createOptimizedRuntime(platform, architecture, applicationDataDirectoryPath, jmodsPath, versionData, jLinkPath, modules);
+      return jLinkOptimizer.createOptimizedRuntime(target, applicationDataDirectoryPath, jmodsPath, versionData, jLinkPath, modules);
     } catch (IOException e) {
       var message = format(ERROR_MESSAGE, e.getMessage());
       log.warn(message);

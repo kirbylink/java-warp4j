@@ -325,7 +325,7 @@ class FileUtilitiesTest {
       assertThat(entries).contains("com/example/MyClass.class");
     }
   }
-  
+
   @Test
   void testCalculateSha256Hash_WhenPathExists_ThenHashWillBeCalculated() throws IOException {
     // Given
@@ -333,13 +333,13 @@ class FileUtilitiesTest {
     var data = "HelloWorld".getBytes();
     Files.write(temporaryFile, data);
     var expectedHash = "872e4e50ce9990d8b041330c47c9ddd11bec6b503ae9386a99da8584e9bb12c4";
-    
+
     // When
     var actualHash = FileUtilities.calculateSha256Hash(temporaryFile);
-    
+
     // Then
     assertThat(actualHash).isEqualTo(expectedHash);
-    
+
   }
 
   private void createJarFile(Path jarFileWithModuleInfoClass) throws IOException {

@@ -81,7 +81,7 @@ class Warp4JCommandTest {
         Arguments.of(NoPermissionException.class, 77)
     );
   }
-  
+
   @Nested
   @DisplayName("Test for Warp4JCommandConfiguration")
   class TestWarp4JCommandConfiguration {
@@ -97,17 +97,17 @@ class Warp4JCommandTest {
           new Target(Platform.WINDOWS, Architecture.X64),
           new Target(Platform.WINDOWS, Architecture.AARCH64)
           );
-      
+
       // When
       var actualTargets = warp4JCommandConfiguration.getAllSelectedTargets();
-      
+
       // Then
       assertThat(actualTargets).isEqualTo(expectedTargets);
     }
-    
+
     @ParameterizedTest
     @MethodSource("provideArchitectureAndPlatforms")
-    void testGetAllSelectedTargets_WhenTargetsAreSelected_ThenTargetsReturned(boolean isLinux, boolean isMacos, boolean isWindows, 
+    void testGetAllSelectedTargets_WhenTargetsAreSelected_ThenTargetsReturned(boolean isLinux, boolean isMacos, boolean isWindows,
         boolean isLinuxX64, boolean isLinuxAarch64, boolean isMacosX64, boolean isMacosAarch64,
         boolean isWindows64, boolean isWindowsAarch64, String expectedArchitecture, Set<Target> expectedTargets) {
       // Given
@@ -123,14 +123,14 @@ class Warp4JCommandTest {
           .windowsX64(isWindows64)
           .architecture(expectedArchitecture)
           .build();
-      
+
       // When
       var actualTargets = warp4JCommandConfiguration.getAllSelectedTargets();
-      
+
       // Then
       assertThat(actualTargets).isEqualTo(expectedTargets);
     }
-    
+
     static Stream<Arguments> provideArchitectureAndPlatforms() {
       return Stream.of(
           Arguments.of(false, false, false, false, false, false, false, false, false, "", Set.of(new Target(Platform.LINUX, Architecture.X64), new Target(Platform.LINUX, Architecture.AARCH64), new Target(Platform.MACOS, Architecture.X64), new Target(Platform.MACOS, Architecture.AARCH64), new Target(Platform.WINDOWS, Architecture.X64),new Target(Platform.WINDOWS, Architecture.AARCH64))),

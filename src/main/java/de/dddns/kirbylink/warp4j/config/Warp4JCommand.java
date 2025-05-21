@@ -221,7 +221,7 @@ public class Warp4JCommand implements Callable<Integer> {
       if (isWindows()) {
         platforms.add(Platform.WINDOWS);
       }
-      
+
       platforms.stream()
           .flatMap(platform -> architectures.stream()
               .map(arch -> new Target(platform, arch)))
@@ -256,7 +256,7 @@ public class Warp4JCommand implements Callable<Integer> {
       }
       return targets;
     }
-    
+
     private static Set<Target> getAllValidTargets() {
       return Set.of(
           new Target(Platform.LINUX, Architecture.X64),

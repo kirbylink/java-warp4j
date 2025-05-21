@@ -105,12 +105,12 @@ public class DownloadService {
   }
 
   public boolean downloadJdk(Target target, VersionData versionData, Path applicationDataDirectoryPath) {
-    log.info("Download JDK version {} for {} with target.getArchitecture() {}", versionData.getMajor(), target.getPlatform(), target.getArchitecture());
+    log.info("Download JDK version {} for {} with target {}", versionData.getMajor(), target.getPlatform(), target.getArchitecture());
     try {
       var adoptiumJavaDownloadUrl = adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(versionData, target);
 
       if (null == adoptiumJavaDownloadUrl) {
-        var message = format("Could not download JDK for %s with target.getArchitecture() %s. Skipping further processing for this combination.", target.getPlatform(), target.getArchitecture());
+        var message = format("Could not download JDK for %s with target %s. Skipping further processing for this combination.", target.getPlatform(), target.getArchitecture());
         log.warn(message);
         return false;
       }
@@ -124,7 +124,7 @@ public class DownloadService {
 
       return true;
     } catch (Exception e) {
-      var message = format("Could not download JDK for %s with target.getArchitecture() %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
+      var message = format("Could not download JDK for %s with target %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return false;

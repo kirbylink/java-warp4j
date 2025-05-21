@@ -140,7 +140,7 @@ class FileServiceTest {
       // Given
       var versionData = new VersionData();
       versionData.setMajor(17);
-      versionData.setSemver("17.0.14+7");
+      versionData.setOpenjdkVersion("17.0.14+7");
 
       var mockedAppDataDir = mock(Path.class);
       var mockedJdkRoot = mock(Path.class);

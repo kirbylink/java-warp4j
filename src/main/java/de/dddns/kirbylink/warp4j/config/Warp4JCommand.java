@@ -221,15 +221,15 @@ public class Warp4JCommand implements Callable<Integer> {
       if (isWindows()) {
         platforms.add(Platform.WINDOWS);
       }
-
-      for (Platform platform : platforms) {
-        for (Architecture arch : architectures) {
-          targets.add(new Target(platform, arch));
-        }
-      }
+      
+      platforms.stream()
+          .flatMap(platform -> architectures.stream()
+              .map(arch -> new Target(platform, arch)))
+          .filter(Warp4JConfiguration::supportedPlatformAndArchitectureByWarp)
+          .forEach(targets::add);
 
       if (targets.isEmpty()) {
-        targets.addAll(Target.getAllValidTargets());
+        targets.addAll(Warp4JCommandConfiguration.getAllValidTargets());
       }
       return targets;
     }
@@ -252,9 +252,20 @@ public class Warp4JCommand implements Callable<Integer> {
         targets.add(new Target(Platform.WINDOWS, Architecture.X64));
       }
       if (isWindowsAarch64()) {
-        targets.add(new Target(Platform.WINDOWS, Architecture.X32));
+        targets.add(new Target(Platform.WINDOWS, Architecture.AARCH64));
       }
       return targets;
+    }
+    
+    private static Set<Target> getAllValidTargets() {
+      return Set.of(
+          new Target(Platform.LINUX, Architecture.X64),
+          new Target(Platform.LINUX, Architecture.AARCH64),
+          new Target(Platform.MACOS, Architecture.X64),
+          new Target(Platform.MACOS, Architecture.AARCH64),
+          new Target(Platform.WINDOWS, Architecture.X64),
+          new Target(Platform.WINDOWS, Architecture.AARCH64)
+      );
     }
   }
 }

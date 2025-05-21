@@ -59,22 +59,22 @@ public class Warp4JCommand implements Callable<Integer> {
   @Option(names = {"--windows"}, description = "Create binary for Windows")
   private boolean isWindows;
 
-  @Option(names = {"--linux-x64"}, description = "Create binary for Linux")
+  @Option(names = {"--linux-x64"}, description = "Create binary for Linux with x64 architecture")
   private boolean isLinuxX64;
 
-  @Option(names = {"--linux-aarch64"}, description = "Create binary for Linux")
+  @Option(names = {"--linux-aarch64"}, description = "Create binary for Linux with aarch64 architecture")
   private boolean isLinuxAarch64;
 
-  @Option(names = {"--macos-x64"}, description = "Create binary for macOS")
+  @Option(names = {"--macos-x64"}, description = "Create binary for macOS with x64 architecture")
   private boolean isMacosX64;
 
-  @Option(names = {"--macos-aarch64"}, description = "Create binary for macOS")
+  @Option(names = {"--macos-aarch64"}, description = "Create binary for macOS with aarch64 architecture")
   private boolean isMacosAarch64;
 
-  @Option(names = {"--windows-x64"}, description = "Create binary for Windows")
+  @Option(names = {"--windows-x64"}, description = "Create binary for Windows with x64 architecture")
   private boolean isWindowsX64;
 
-  @Option(names = {"--windows-aarch64"}, description = "Create binary for Windows")
+  @Option(names = {"--windows-aarch64"}, description = "Create binary for Windows with aarch64 architecture")
   private boolean isWindowsAarch64;
 
   @Option(names = {"--arch"}, description = "Target architecture (x64 or aarch64) Default: both")

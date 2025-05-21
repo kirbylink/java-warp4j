@@ -52,7 +52,7 @@ public class DownloadService {
 
     var warpPackerUrl = Warp4JConfiguration.getWarpUrl(target);
 
-    log.info("Download Warp Packer from {} for current target.getPlatform() and target.getArchitecture().", warpPackerUrl);
+    log.info("Download Warp Packer from {} for current target and architecture.", warpPackerUrl);
 
     downloadUtilities.downloadFile(new URL(warpPackerUrl), warpPackerPath);
 

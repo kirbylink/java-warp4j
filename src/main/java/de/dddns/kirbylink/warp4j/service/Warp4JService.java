@@ -309,8 +309,7 @@ public class Warp4JService {
       return jdkProcessingState;
     }
 
-    var target = jdkProcessingState.target();
-    var bundleDirectoryPath = fileService.copyJdkToBundleDirectory(target, applicationDataDirectoryPath, versionDateToUse);
+    var bundleDirectoryPath = fileService.copyJdkToBundleDirectory(jdkProcessingState.target(), jdkProcessingState.extractedJdkPath(), applicationDataDirectoryPath, versionDateToUse);
 
     if (null != bundleDirectoryPath) {
       return jdkProcessingState.toBuilder().bundlePath(bundleDirectoryPath).build();

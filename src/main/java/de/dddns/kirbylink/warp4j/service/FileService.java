@@ -50,8 +50,8 @@ public class FileService {
     }
   }
 
-  public Path copyJdkToBundleDirectory(Target target, Path applicationDataDirectoryPath, VersionData versionDateToUse) {
-    var bundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(target.getPlatform(), target.getArchitecture(), applicationDataDirectoryPath, applicationDataDirectoryPath, versionDateToUse);
+  public Path copyJdkToBundleDirectory(Target target, Path extractedJdkPath, Path applicationDataDirectoryPath, VersionData versionDateToUse) {
+    var bundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(target, applicationDataDirectoryPath, extractedJdkPath, versionDateToUse);
     if (null != bundleDirectoryPath) {
       return bundleDirectoryPath;
     }

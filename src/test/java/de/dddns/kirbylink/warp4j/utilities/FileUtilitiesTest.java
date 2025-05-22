@@ -48,7 +48,7 @@ class FileUtilitiesTest {
     zipFile = createTestZip(temporaryDirectory);
     tarGzFile = createTestTarGz(temporaryDirectory);
   }
-  
+
   @AfterAll
   static void cleanUp() throws IOException {
     Files.delete(tarGzFile);
@@ -335,7 +335,7 @@ class FileUtilitiesTest {
       assertThat(entries).contains("com/example/MyClass.class");
     }
   }
-  
+
   @Test
   void testCopyJdkToBundleDirectory_WhenJdkExists_ThenJdkPathIsCopied() throws IOException {
     // Given
@@ -346,14 +346,14 @@ class FileUtilitiesTest {
     var versionData = new VersionData();
     versionData.setMajor(17);
     var expectedBundleDirectoryPath = applicationDataDirectory.resolve("bundle").resolve("linux").resolve("x64");
-    
+
     // When
     var actualBundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(target, applicationDataDirectory, extractedJdkPath, versionData);
-    
+
     // Then
     assertThat(actualBundleDirectoryPath).isEqualTo(expectedBundleDirectoryPath);
   }
-  
+
   @Test
   void testCopyJdkToBundleDirectory_WhenJdkNotExist_ThenJdkPathIsNotCopied() throws IOException {
     // Given
@@ -361,10 +361,10 @@ class FileUtilitiesTest {
     var applicationDataDirectory = temporaryDirectory.resolve("application-data-folder");
     var versionData = new VersionData();
     versionData.setMajor(17);
-    
+
     // When
     var actualBundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(target, applicationDataDirectory, null, versionData);
-    
+
     // Then
     assertThat(actualBundleDirectoryPath).isNull();
   }

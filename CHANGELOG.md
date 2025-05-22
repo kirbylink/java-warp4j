@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.1.0] - 2025-05-22
+### Added
+- Check if existing warp-packer is compatible with application.
+- Support warp-packer v1.1.0, macOS and Windows aarch64 builds.
+- New CLI args for selecting specific platform-architecture targets
+
+### Changed
+- Update Maven dependencies
+
+### Fixed
+- Parse existing JDK folders with OpenJdkVersion instead of SemVer
+- Wrong path resulted in recursive loop to resolve JDK path
+
 ## [v1.0.0] - 2025-05-11
 ### Added
 - Download missing Warp-Packer for current system if supported
@@ -31,4 +44,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Supports optimization of different Java versions
 
 [unreleased]: https://github.com/kirbylink/java-warp4j/compare/main...HEAD
+[v1.1.0]: https://github.com/kirbylink/java-warp4j/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/kirbylink/java-warp4j/releases/tag/v1.0.0

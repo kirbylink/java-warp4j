@@ -6,8 +6,8 @@ The latest version of the Application is currently supported. Please ensure you 
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| 1.1.x   | :white_check_mark: |
+| < 1.1   | :x:                |
 
 ## Reporting a Vulnerability
 

@@ -81,12 +81,11 @@ class CachedJdkCollectorServiceTest {
   void testCollectCachedJdkState_WhenNothingExists_ThenCleanupIsTrue() {
     // Given
     var versionData = new VersionData();
-    versionData.setMajor(17);
-    versionData.setMajor(17);
+    versionData.setMajor(21);
     versionData.setMinor(0);
-    versionData.setPatch(14);
-    versionData.setBuild(7);
-    versionData.setSemver("17.0.14+7");
+    versionData.setPatch(7);
+    versionData.setBuild(6);
+    versionData.setOpenjdkVersion("21.0.7+6-LTS");
 
     when(mockedApplicationDataDirectory.resolve("jdk")).thenReturn(mockedJdkDirectory);
     when(mockedJdkDirectory.resolve("linux")).thenReturn(mockedPlatformPath);

@@ -40,7 +40,7 @@ public class CachedJdkCollectorService {
       Files.createDirectories(applicationDataJdkDirectoryPath);
       var jdkCompressedFilePath = applicationDataJdkDirectoryPath.resolve(platform.equals(Platform.WINDOWS) ? JDK_ZIP : JDK_TAR_GZ);
       var isDownloaded = Files.exists(jdkCompressedFilePath);
-      var versionPrefix = isOnlyFeatureVersion(versionData) ? String.valueOf(versionData.getMajor()) : versionData.getSemver();
+      var versionPrefix = isOnlyFeatureVersion(versionData) ? String.valueOf(versionData.getMajor()) : versionData.getOpenjdkVersion().replace("-LTS", "");
       var optionalExtractedJdkPath = FileUtilities.optionalExtractedJdkPath(applicationDataJdkDirectoryPath, versionPrefix);
 
       return JdkProcessingState.builder()

@@ -5,8 +5,7 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record JdkProcessingState(
-    Platform platform,
-    Architecture architecture,
+    Target target,
     boolean isTarget,
     boolean downloaded,
     boolean extracted,

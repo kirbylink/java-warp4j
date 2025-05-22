@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.utilities.FileUtilities;
 import de.dddns.kirbylink.warp4j.utilities.WarpPacker;
 
@@ -54,30 +55,28 @@ class WarpServiceTest {
   @Test
   void testWarpBundle_WhenNoException_ThenReturnsTrue() throws Exception {
     // Given
-    var platform = Platform.LINUX;
-    var arch = Architecture.X64;
+    var target = new Target(Platform.LINUX, Architecture.X64);
     var prefix = "warp4j";
 
     // When
-    var result = warpService.warpBundle(platform, arch, bundleDir, scriptPath, outputPath, warpPackerPath, prefix);
+    var result = warpService.warpBundle(target, bundleDir, scriptPath, outputPath, warpPackerPath, prefix);
 
     // Then
     assertThat(result).isTrue();
     mockedFileUtilities.verify(() -> FileUtilities.deleteRecursively(outputPath));
-    verify(mockWarpPacker).warpApplication(warpPackerPath, platform, arch, bundleDir, "start.sh", outputPath, prefix);
+    verify(mockWarpPacker).warpApplication(warpPackerPath, target, bundleDir, "start.sh", outputPath, prefix);
   }
 
   @Test
   void testWarpBundle_WhenIOException_ThenReturnsFalse() {
     // Given
-    var platform = Platform.LINUX;
-    var arch = Architecture.X64;
+    var target = new Target(Platform.LINUX, Architecture.X64);
     var prefix = "warp4j";
 
     mockedFileUtilities.when(() -> FileUtilities.deleteRecursively(outputPath)).thenThrow(new IOException("Delete failed"));
 
     // When
-    var result = warpService.warpBundle(platform, arch, bundleDir, scriptPath, outputPath, warpPackerPath, prefix);
+    var result = warpService.warpBundle(target, bundleDir, scriptPath, outputPath, warpPackerPath, prefix);
 
     // Then
     assertThat(result).isFalse();
@@ -88,18 +87,17 @@ class WarpServiceTest {
   @Test
   void testWarpBundle_WhenInterruptedException_ThenReturnsFalseAndInterruptsThread() throws Exception {
     // Given
-    var platform = Platform.LINUX;
-    var arch = Architecture.X64;
+    var target = new Target(Platform.LINUX, Architecture.X64);
     var prefix = "warp4j";
 
-    doThrow(new InterruptedException("Thread interrupted")).when(mockWarpPacker).warpApplication(any(), any(), any(), any(), any(), any(), any());
+    doThrow(new InterruptedException("Thread interrupted")).when(mockWarpPacker).warpApplication(any(), any(), any(), any(), any(), any());
 
     // When
-    var result = warpService.warpBundle(platform, arch, bundleDir, scriptPath, outputPath, warpPackerPath, prefix);
+    var result = warpService.warpBundle(target, bundleDir, scriptPath, outputPath, warpPackerPath, prefix);
 
     // Then
     assertThat(result).isFalse();
-    verify(mockWarpPacker).warpApplication(any(), any(), any(), any(), any(), any(), any());
+    verify(mockWarpPacker).warpApplication(any(), any(), any(), any(), any(), any());
     assertThat(Thread.currentThread().isInterrupted()).isTrue();
   }
 }

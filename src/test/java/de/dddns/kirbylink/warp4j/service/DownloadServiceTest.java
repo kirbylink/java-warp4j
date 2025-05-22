@@ -21,8 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import de.dddns.kirbylink.warp4j.config.Warp4JConfiguration;
 import de.dddns.kirbylink.warp4j.config.Warp4JResources;
+import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.AvailableReleaseVersion;
+import de.dddns.kirbylink.warp4j.model.Platform;
 import de.dddns.kirbylink.warp4j.model.ReleaseVersionsResponse;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.AdoptiumClient;
 import de.dddns.kirbylink.warp4j.utilities.DownloadUtilities;
@@ -61,18 +64,17 @@ class DownloadServiceTest {
   @Test
   void testDownloadJdk_WhenUrlIsValid_ThenReturnsTrue() throws Exception {
     // Given
-    var mockPath = mock(Path.class);
-    var platform = de.dddns.kirbylink.warp4j.model.Platform.LINUX;
-    var arch = de.dddns.kirbylink.warp4j.model.Architecture.X64;
+    var mockedPath = mock(Path.class);
+    var target = new Target(Platform.LINUX, Architecture.X64);
     var version = new VersionData();
     version.setMajor(21);
 
-    when(adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(version, arch, platform)).thenReturn("https://example.com/jdk.tar.gz");
-    when(mockPath.resolve(anyString())).thenReturn(mockPath);
-    mockedFiles.when(() -> Files.createDirectories(mockPath)).thenReturn(mockPath);
+    when(adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(version, target)).thenReturn("https://example.com/jdk.tar.gz");
+    when(mockedPath.resolve(anyString())).thenReturn(mockedPath);
+    mockedFiles.when(() -> Files.createDirectories(mockedPath)).thenReturn(mockedPath);
 
     // When
-    var result = downloadService.downloadJdk(platform, arch, version, mockPath);
+    var result = downloadService.downloadJdk(target, version, mockedPath);
 
     // Then
     assertThat(result).isTrue();
@@ -82,16 +84,15 @@ class DownloadServiceTest {
   @Test
   void testDownloadJdk_WhenDownloadUrlIsNull_ThenReturnsFalse() {
     // Given
-    var mockPath = mock(Path.class);
-    var platform = de.dddns.kirbylink.warp4j.model.Platform.LINUX;
-    var arch = de.dddns.kirbylink.warp4j.model.Architecture.X64;
+    var mockedPath = mock(Path.class);
+    var target = new Target(Platform.LINUX, Architecture.X64);
     var version = new VersionData();
     version.setMajor(17);
 
-    when(adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(version, arch, platform)).thenReturn(null);
+    when(adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(version, target)).thenReturn(null);
 
     // When
-    var result = downloadService.downloadJdk(platform, arch, version, mockPath);
+    var result = downloadService.downloadJdk(target, version, mockedPath);
 
     // Then
     assertThat(result).isFalse();
@@ -172,39 +173,41 @@ class DownloadServiceTest {
     // Then
     assertThat(actualVersionData).usingRecursiveComparison().isEqualTo(expectedVersionData);
   }
-  
+
   @Test
   void testDownloadWarpPackerIfNeeded_WhenFileDoesNotExists_DoesDownload() throws Exception {
     // Given
-    var mockPath = mock(Path.class);
-    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(false);
-    mockedWarp4JConfiguration.when(Warp4JConfiguration::getArchitecture).thenReturn("x64");
-    mockedWarp4JConfiguration.when(Warp4JConfiguration::getOsName).thenReturn("windows");
-    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(false);
-    mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getWarpUrl(any(), any())).thenReturn("http://example.org");
-    
+    var mockedPath = mock(Path.class);
+    var mockedTarget = mock(Target.class);
+    when(mockedTarget.getArchitecture()).thenReturn(Architecture.X64);
+    when(mockedTarget.getPlatform()).thenReturn(Platform.WINDOWS);
+    mockedFiles.when(() -> Files.exists(mockedPath)).thenReturn(false);
+    mockedFiles.when(() -> Files.exists(mockedPath)).thenReturn(false);
+    mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getWarpUrl(any())).thenReturn("http://example.org");
+
     // When
-    downloadService.downloadWarpPackerIfNeeded(mockPath);
-    
+    downloadService.downloadWarpPackerIfNeeded(mockedPath, mockedTarget);
+
     // Then
     verify(downloadUtilities).downloadFile(any(), any());
   }
-  
+
   @Test
   void testDownloadWarpPackerIfNeeded_WhenFileAlreadyExistsButWrongVersion_DoesDownload() throws Exception {
     // Given
-    var mockPath = mock(Path.class);
-    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(false);
-    mockedWarp4JConfiguration.when(Warp4JConfiguration::getArchitecture).thenReturn("x64");
-    mockedWarp4JConfiguration.when(Warp4JConfiguration::getOsName).thenReturn("windows");
-    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(true);
-    mockedFileUtilities.when(() -> FileUtilities.calculateSha256Hash(mockPath)).thenReturn("currentHash");
+    var mockedPath = mock(Path.class);
+    var mockedTarget = mock(Target.class);
+    when(mockedTarget.getArchitecture()).thenReturn(Architecture.X64);
+    when(mockedTarget.getPlatform()).thenReturn(Platform.WINDOWS);
+    mockedFiles.when(() -> Files.exists(mockedPath)).thenReturn(false);
+    mockedFiles.when(() -> Files.exists(mockedPath)).thenReturn(true);
+    mockedFileUtilities.when(() -> FileUtilities.calculateSha256Hash(mockedPath)).thenReturn("currentHash");
     mockedWarp4JResources.when(() -> Warp4JResources.get(any())).thenReturn("expectedHash");
-    mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getWarpUrl(any(), any())).thenReturn("http://example.org");
-    
+    mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getWarpUrl(any())).thenReturn("http://example.org");
+
     // When
-    downloadService.downloadWarpPackerIfNeeded(mockPath);
-    
+    downloadService.downloadWarpPackerIfNeeded(mockedPath, mockedTarget);
+
     // Then
     verify(downloadUtilities).downloadFile(any(), any());
   }
@@ -212,15 +215,16 @@ class DownloadServiceTest {
   @Test
   void testDownloadWarpPackerIfNeeded_WhenFileAlreadyExists_DoesNotDownload() throws Exception {
     // Given
-    var mockPath = mock(Path.class);
-    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(true);
-    mockedWarp4JConfiguration.when(Warp4JConfiguration::getArchitecture).thenReturn("x64");
-    mockedWarp4JConfiguration.when(Warp4JConfiguration::getOsName).thenReturn("linux");
-    mockedFileUtilities.when(() -> FileUtilities.calculateSha256Hash(mockPath)).thenReturn("expectedHash");
+    var mockedPath = mock(Path.class);
+    var mockedTarget = mock(Target.class);
+    when(mockedTarget.getArchitecture()).thenReturn(Architecture.X64);
+    when(mockedTarget.getPlatform()).thenReturn(Platform.LINUX);
+    mockedFiles.when(() -> Files.exists(mockedPath)).thenReturn(true);
+    mockedFileUtilities.when(() -> FileUtilities.calculateSha256Hash(mockedPath)).thenReturn("expectedHash");
     mockedWarp4JResources.when(() -> Warp4JResources.get(any())).thenReturn("expectedHash");
 
     // When
-    downloadService.downloadWarpPackerIfNeeded(mockPath);
+    downloadService.downloadWarpPackerIfNeeded(mockedPath, mockedTarget);
 
     // Then
     verify(downloadUtilities, never()).downloadFile(any(), any());
@@ -229,18 +233,19 @@ class DownloadServiceTest {
   @Test
   void testDownloadWarpPackerIfNeeded_WhenSetExecutableFails_ThenThrowsException() {
     // Given
-    var mockPath = mock(Path.class);
+    var mockedPath = mock(Path.class);
+    var mockedTarget = mock(Target.class);
+    when(mockedTarget.getArchitecture()).thenReturn(Architecture.X64);
+    when(mockedTarget.getPlatform()).thenReturn(Platform.LINUX);
     var file = mock(java.io.File.class);
-    when(mockPath.toFile()).thenReturn(file);
+    when(mockedPath.toFile()).thenReturn(file);
     when(file.setExecutable(true)).thenReturn(false);
-    mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(false);
-    mockedWarp4JConfiguration.when(Warp4JConfiguration::getArchitecture).thenReturn("x64");
-    mockedWarp4JConfiguration.when(Warp4JConfiguration::getOsName).thenReturn("linux");
-    mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getWarpUrl(any(), any())).thenReturn("http://example.org");
+    mockedFiles.when(() -> Files.exists(mockedPath)).thenReturn(false);
+    mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getWarpUrl(any())).thenReturn("http://example.org");
 
     // When
     var throwAbleMethod = catchThrowable(() -> {
-      downloadService.downloadWarpPackerIfNeeded(mockPath);
+      downloadService.downloadWarpPackerIfNeeded(mockedPath, mockedTarget);
     });
 
     // Then

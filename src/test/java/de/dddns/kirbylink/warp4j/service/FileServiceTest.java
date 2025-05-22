@@ -24,6 +24,7 @@ import de.dddns.kirbylink.warp4j.config.Warp4JCommand.Warp4JCommandConfiguration
 import de.dddns.kirbylink.warp4j.config.Warp4JConfiguration;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.FileUtilities;
 
@@ -53,8 +54,7 @@ class FileServiceTest {
   @DisplayName("Tests for Windows")
   class TestsForWindows {
 
-    private final Platform platform = Platform.WINDOWS;
-    private final Architecture architecture = Architecture.X64;
+    private final Target target = new Target(Platform.WINDOWS, Architecture.X64);
 
     @Test
     void testExtractJdkAndDeleteCompressedFile_WhenWindows_ThenZipExtractedAndDeleted() {
@@ -77,7 +77,7 @@ class FileServiceTest {
       mockedFileUtilities.when(() -> FileUtilities.optionalExtractedJdkPath(mockedApplicationDataDirectory, "17")).thenReturn(Optional.of(mockedApplicationDataDirectory));
 
       // When
-      var result = fileService.extractJdkAndDeleteCompressedFile(platform, architecture, versionData, mockedApplicationDataDirectory);
+      var result = fileService.extractJdkAndDeleteCompressedFile(target, versionData, mockedApplicationDataDirectory);
 
       // Then
       assertThat(result).isNotNull();
@@ -99,7 +99,7 @@ class FileServiceTest {
       mockedFileUtilities.when(() -> FileUtilities.createZip(mockedBundlePath, mockedCompressedTarget)).then(inv -> null);
 
       // When
-      var result = fileService.compressBundle(platform, architecture, mockedBundlePath);
+      var result = fileService.compressBundle(target, mockedBundlePath);
 
       // Then
       assertThat(result).isTrue();
@@ -122,7 +122,7 @@ class FileServiceTest {
       mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getLauncherWindows(any(), any(), any(), eq(true))).thenReturn("echo Windows!");
 
       // When
-      var result = fileService.copyJarFileAndCreateLauncherScriptToBundleDirectory(platform, architecture, mockedBundlePath, mockedJarPath, mockedConfig);
+      var result = fileService.copyJarFileAndCreateLauncherScriptToBundleDirectory(target, mockedBundlePath, mockedJarPath, mockedConfig);
 
       // Then
       assertThat(result).isNotNull();
@@ -133,8 +133,7 @@ class FileServiceTest {
   @DisplayName("Tests for Linux")
   class TestsForLinux {
 
-    private final Platform platform = Platform.LINUX;
-    private final Architecture architecture = Architecture.X64;
+    private final Target target = new Target(Platform.LINUX, Architecture.X64);
 
     @Test
     void testExtractJdkAndDeleteCompressedFile_WhenLinux_ThenReturnsExtractedPath() {
@@ -151,8 +150,8 @@ class FileServiceTest {
 
       when(mockedAppDataDir.resolve(anyString())).thenReturn(mockedAppDataDir);
       when(mockedAppDataDir.resolve("jdk")).thenReturn(mockedJdkRoot);
-      when(mockedJdkRoot.resolve(platform.getValue())).thenReturn(mockedJdkDirectory);
-      when(mockedJdkDirectory.resolve(architecture.getValue())).thenReturn(mockedJdkDirectory);
+      when(mockedJdkRoot.resolve(Platform.LINUX.getValue())).thenReturn(mockedJdkDirectory);
+      when(mockedJdkDirectory.resolve(Architecture.X64.getValue())).thenReturn(mockedJdkDirectory);
       when(mockedJdkDirectory.resolve("jdk.tar.gz")).thenReturn(mockedCompressed);
       when(mockedExtracted.getFileName()).thenReturn(Path.of("jdk-17.0.14+7"));
 
@@ -164,7 +163,7 @@ class FileServiceTest {
       mockedFiles.when(() -> Files.isDirectory(mockedExtracted)).thenReturn(true);
 
       // When
-      var result = fileService.extractJdkAndDeleteCompressedFile(platform, architecture, versionData, mockedAppDataDir);
+      var result = fileService.extractJdkAndDeleteCompressedFile(target, versionData, mockedAppDataDir);
 
       // Then
       assertThat(result).isEqualTo(mockedExtracted);
@@ -186,7 +185,7 @@ class FileServiceTest {
       mockedFileUtilities.when(() -> FileUtilities.createTarGz(mockedBundlePath, mockedCompressedTarget)).then(inv -> null);
 
       // When
-      var result = fileService.compressBundle(platform, architecture, mockedBundlePath);
+      var result = fileService.compressBundle(target, mockedBundlePath);
 
       // Then
       assertThat(result).isTrue();
@@ -211,7 +210,7 @@ class FileServiceTest {
       mockedWarp4JConfiguration.when(() -> Warp4JConfiguration.getLauncherBash(any(), any(), any(), any())).thenReturn("#!/bin/bash\necho Linux");
 
       // When
-      var result = fileService.copyJarFileAndCreateLauncherScriptToBundleDirectory(platform, architecture, mockedBundlePath, mockedJarPath, mockedConfig);
+      var result = fileService.copyJarFileAndCreateLauncherScriptToBundleDirectory(target, mockedBundlePath, mockedJarPath, mockedConfig);
 
       // Then
       assertThat(result).isEqualTo(mockedScriptPath);
@@ -222,8 +221,7 @@ class FileServiceTest {
   @DisplayName("Tests for MacOs")
   class TestsForMacOs {
 
-    private final Platform platform = Platform.MACOS;
-    private final Architecture architecture = Architecture.X64;
+    private final Target target = new Target(Platform.MACOS, Architecture.X64);
 
     @Test
     void testCompressBundle_WhenMac_ThenAppStructureCreated() {
@@ -252,7 +250,7 @@ class FileServiceTest {
       mockedFileUtilities.when(() -> FileUtilities.createTarGz(mockedAppDir, mockedCompressed)).then(inv -> null);
 
       // When
-      var result = fileService.compressBundle(platform, architecture, mockedBundlePath);
+      var result = fileService.compressBundle(target, mockedBundlePath);
 
       // Then
       assertThat(result).isTrue();

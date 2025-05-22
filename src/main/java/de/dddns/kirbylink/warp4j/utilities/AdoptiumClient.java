@@ -13,10 +13,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.dddns.kirbylink.warp4j.config.Warp4JConfiguration;
-import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.AvailableReleaseVersion;
-import de.dddns.kirbylink.warp4j.model.Platform;
 import de.dddns.kirbylink.warp4j.model.ReleaseVersionsResponse;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.Release;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +32,13 @@ public class AdoptiumClient {
     this(HttpClient.newHttpClient(), JsonMapper.builder().addModule(new JavaTimeModule()).addModule(new JsonNullableModule()).build());
   }
 
-  public String getDownloadUrlForSpecificJavaVersionDataAndSystem(VersionData versionData, Architecture architecture, Platform platform) {
+  public String getDownloadUrlForSpecificJavaVersionDataAndSystem(VersionData versionData, Target target) {
     String url;
     if(Warp4JConfiguration.isOnlyFeatureVersion(versionData)) {
-      url = Warp4JConfiguration.getAdoptiumApiAssetsFeatureReleasesUrl(versionData.getMajor().toString(), architecture.getValue(), platform.getValue());
+      url = Warp4JConfiguration.getAdoptiumApiAssetsFeatureReleasesUrl(versionData.getMajor().toString(), target.getArchitecture().getValue(), target.getPlatform().getValue());
       log.debug("Adoptium api assets feature releases url: {}", url);
     } else {
-      url = Warp4JConfiguration.getAdoptiumApiAssetsVersionUrl(versionData.getOpenjdkVersion(), architecture.getValue(), platform.getValue());
+      url = Warp4JConfiguration.getAdoptiumApiAssetsVersionUrl(versionData.getOpenjdkVersion(), target.getArchitecture().getValue(), target.getPlatform().getValue());
       log.debug("Adoptium api assets version url: {}", url);
     }
     try {
@@ -48,7 +47,7 @@ public class AdoptiumClient {
       log.debug(downloadUrl);
       return downloadUrl;
     } catch (IOException e) {
-      log.warn("No download found for architecture {} and platform {}", architecture, platform.getValue());
+      log.warn("No download found for target.getArchitecture() {} and target.getPlatform() {}", target.getArchitecture(), target.getPlatform().getValue());
     }
     return null;
   }

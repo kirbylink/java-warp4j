@@ -47,7 +47,7 @@ public class AdoptiumClient {
       log.debug(downloadUrl);
       return downloadUrl;
     } catch (IOException e) {
-      log.warn("No download found for target.getArchitecture() {} and target.getPlatform() {}", target.getArchitecture(), target.getPlatform().getValue());
+      log.warn("No download found for target {} and platform {}", target.getArchitecture(), target.getPlatform().getValue());
     }
     return null;
   }

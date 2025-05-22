@@ -115,14 +115,14 @@ To use `java-warp4j`:
 After building or downloading `java-warp4j`, run:
 
 ```bash
-java -jar warp4j-1.0.0-jar-with-dependencies.jar \
+java -jar warp4j-1.1.0-jar-with-dependencies.jar \
   --jar my-app.jar \
   --output ./target \
   --optimize \
-  --linux \
-  --windows \
-  --macos \
-  --arch x64 \
+  --linux-x64 \
+  --linux-aarch64 \
+  --windows-x64 \
+  --macos-x64 \
   --prefix myapp
 ```
 
@@ -134,11 +134,12 @@ If you want to build and run directly from source, see [BUILD.md](./BUILD.md).
 
 ### Command-Line Parameters
 ```sh
-Usage: warp4j [-hsv] [--linux] [--macos] [--optimize] [--pull] [--spring-boot]
-              [--windows] [--add-modules=<additionalModules>]
-              [--arch=<architecture>] [-cp=<classPath>] [-j=<javaVersion>]
-              --jar=<jarFilePath> [--jdk=<jdkPath>] [-o=<outputDirectoryPath>]
-              [-p=<prefix>]
+Usage: warp4j [-hsv] [--linux] [--linux-aarch64] [--linux-x64] [--macos]
+              [--macos-aarch64] [--macos-x64] [--optimize] [--pull]
+              [--spring-boot] [--windows] [--windows-aarch64] [--windows-x64]
+              [--add-modules=<additionalModules>] [--arch=<architecture>]
+              [-cp=<classPath>] [-j=<javaVersion>] --jar=<jarFilePath>
+              [--jdk=<jdkPath>] [-o=<outputDirectoryPath>] [-p=<prefix>]
 Turn JAR into a self-contained executable
       --add-modules=<additionalModules>
                              A list of additional java modules that should be
@@ -154,7 +155,11 @@ Turn JAR into a self-contained executable
       --jdk=<jdkPath>       Path to JDK that contains the binaries jdep(.exe)
                               and jlink(.exe)
       --linux               Create binary for Linux
+      --linux-aarch64       Create binary for Linux with aarch64 architecture
+      --linux-x64           Create binary for Linux with x64 architecture
       --macos               Create binary for macOS
+      --macos-aarch64       Create binary for macOS with aarch64 architecture
+      --macos-x64           Create binary for macOS with x64 architecture
   -o, --output=<outputDirectoryPath>
                             Output directory (default: ./warped)
       --optimize            Use optimized JRE instead of JDK
@@ -166,6 +171,8 @@ Turn JAR into a self-contained executable
                               modules
   -v, --verbose             Enable verbose logging
       --windows             Create binary for Windows
+      --windows-aarch64     Create binary for Windows with aarch64 architecture
+      --windows-x64         Create binary for Windows with x64 architecture
 ```
 
 ### Offline Support
@@ -209,28 +216,26 @@ docker pull ghcr.io/kirbylink/java-warp4j:latest
 ### Example 1: Create a Linux aarch64 executable for [java-warp4j](https://github.com/kirbylink/java-warp4j)
 
 ```bash
-java -jar warp4j-1.0.0-jar-with-dependencies.jar \
-    --jar /home/developer/git/java-warp4j/target/warp4j-1.0.0-jar-with-dependencies.jar \
+java -jar warp4j-1.1.0-jar-with-dependencies.jar \
+    --jar /home/developer/git/java-warp4j/target/warp4j-1.1.0-jar-with-dependencies.jar \
 	--output /home/developer/git/java-warp4j/target \
 	--optimize \
 	--class-path /home/developer/git/java-warp4j/target/classes \
 	--add-modules jdk.crypto.ec \
-	--arch aarch64 \
-	--linux \
+	--linux-aarch64 \
 	--prefix warp4j
 ```
 
 ### Example 2: Cross-compile for macOS and Windows for [java-e-liquid-calculator](https://github.com/kirbylink/java-e-liquid-calculator)
 
 ```bash
-java -jar warp4j-1.0.0-jar-with-dependencies.jar \
+java -jar warp4j-1.1.0-jar-with-dependencies.jar \
     --jar /home/developer/git/java-e-liquid-calculator/target/e-liquid-calculator-1.1.6-jar-with-dependencies.jar \
 	--output /home/developer/git/java-e-liquid-calculator/target \
 	--optimize \
 	--spring-boot \
-	--arch x64 \
-	--windows \
-	--macos \
+	--windows-x64 \
+	--macos-x64 \
 	--prefix e-liquid-calculator
 ```
 
@@ -260,9 +265,8 @@ docker run --rm \
   java-warp4j \
   --spring-boot \
   --jar /data/e-liquid-calculator-1.1.6-jar-with-dependencies.jar \
-  --linux \
+  --linux-x64 \
   --pull \
-  --arch=x64 \
   --output /data \
   --optimize \
   --prefix e-liquid-calculator
@@ -280,8 +284,7 @@ docker run --rm \
   java-warp4j \
   --spring-boot \
   --jar /data/e-liquid-calculator-1.1.6-jar-with-dependencies.jar \
-  --linux \
-  --arch x64 \
+  --linux-x64 \
   --output /data \
   --optimize \
   --prefix e-liquid-calculator

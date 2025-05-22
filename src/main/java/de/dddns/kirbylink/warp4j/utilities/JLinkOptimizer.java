@@ -3,8 +3,8 @@ package de.dddns.kirbylink.warp4j.utilities;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.Warp4JRuntimeException;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +16,17 @@ public class JLinkOptimizer {
 
   private final ProcessExecutor processExecutor;
 
-  public Path createOptimizedRuntime(Platform platform, Architecture architecture, Path applicationDataDirectory, Path jmodsPath, VersionData versionData, Path jlinkPath, String modules) throws IOException, InterruptedException {
-    if (platform.equals(Platform.MACOS)) {
+  public Path createOptimizedRuntime(Target target, Path applicationDataDirectory, Path jmodsPath, VersionData versionData, Path jlinkPath, String modules) throws IOException, InterruptedException {
+    if (target.getPlatform().equals(Platform.MACOS)) {
       jmodsPath = jmodsPath.resolve("Contents/Home/");
     }
     jmodsPath = jmodsPath.resolve("jmods");
 
     var stripDebug = (versionData.getMajor() >= 13) ? "strip-java-debug-attributes" : "strip-debug";
 
-    var outputPath = applicationDataDirectory.resolve("bundle").resolve(platform.getValue()).resolve(architecture.getValue()).resolve("java");
+    var outputPath = applicationDataDirectory.resolve("bundle").resolve(target.getPlatform().getValue()).resolve(target.getArchitecture().getValue()).resolve("java");
 
-    log.info("Creating minimal runtime for {}...", platform);
+    log.info("Creating minimal runtime for {}...", target.getPlatform());
 
     List<String> command = List.of(jlinkPath.toString(), "--no-header-files", "--no-man-pages", "--" + stripDebug, "--module-path", jmodsPath.toString(), "--add-modules", modules, "--output", outputPath.toString());
 

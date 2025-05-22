@@ -8,6 +8,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.math.BigInteger;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
@@ -33,9 +36,9 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
-import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.JavaVersion;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -297,10 +300,10 @@ public class FileUtilities {
     return cleanedJar;
   }
 
-  public static Path copyJdkToBundleDirectory(Platform platform, Architecture architecture, Path applicationDataDirectory, Path extractedJdkPath, VersionData versionData) {
+  public static Path copyJdkToBundleDirectory(Target target, Path applicationDataDirectory, Path extractedJdkPath, VersionData versionData) {
     var bundleDirectoryPath =
-        applicationDataDirectory.resolve(APPLICATION_DATA_BUNDLE_DIRECTORY).resolve(platform.getValue()).resolve(architecture.getValue()).resolve(APPLICATION_DATA_JAVA_DIRECTORY);
-    log.info("Copy JDK to bundle for {} with architecture {} to {}", platform, architecture, bundleDirectoryPath);
+        applicationDataDirectory.resolve(APPLICATION_DATA_BUNDLE_DIRECTORY).resolve(target.getPlatform().getValue()).resolve(target.getArchitecture().getValue()).resolve(APPLICATION_DATA_JAVA_DIRECTORY);
+    log.info("Copy JDK to bundle for {} with architecture {} to {}", target.getPlatform(), target.getArchitecture(), bundleDirectoryPath);
     try {
       Files.createDirectories(bundleDirectoryPath.getParent());
 
@@ -308,10 +311,20 @@ public class FileUtilities {
       FileUtilities.copyRecursively(jrePath, bundleDirectoryPath);
       return bundleDirectoryPath.getParent();
     } catch (Exception e) {
-      var message = format("Could not copy JDK to bundle forlder for %s with architecture %s. Skipping further processing for this combination. Reason: %s", platform, architecture, e.getMessage());
+      var message = format("Could not copy JDK to bundle forlder for %s with architecture %s. Skipping further procssing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return null;
+    }
+  }
+
+  public static String calculateSha256Hash(Path file) throws IOException {
+    try {
+      var data = Files.readAllBytes(file);
+      var hash = MessageDigest.getInstance("SHA-256").digest(data);
+      return new BigInteger(1, hash).toString(16);
+    } catch (NoSuchAlgorithmException e) {
+      return "";
     }
   }
 

@@ -11,8 +11,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermissions;
 import de.dddns.kirbylink.warp4j.config.Warp4JCommand.Warp4JCommandConfiguration;
-import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.FileUtilities;
 import lombok.extern.slf4j.Slf4j;
@@ -25,47 +25,47 @@ public class FileService {
   private static final String JAR_EXTENSION_REGEX = "\\.jar";
   private static final String COMPRESS_AS_MESSAGE = "Compress {} as {}";
 
-  public Path extractJdkAndDeleteCompressedFile(Platform platform, Architecture architecture, VersionData versionData, Path applicationDataDirectory) {
-    var pathToApplicationDataJdkDirectory = applicationDataDirectory.resolve("jdk").resolve(platform.getValue()).resolve(architecture.getValue());
-    log.info("Extract JDK version {} for {} with architecture {}", versionData.getMajor(), platform, architecture);
+  public Path extractJdkAndDeleteCompressedFile(Target target, VersionData versionData, Path applicationDataDirectory) {
+    var pathToApplicationDataJdkDirectory = applicationDataDirectory.resolve("jdk").resolve(target.getPlatform().getValue()).resolve(target.getArchitecture().getValue());
+    log.info("Extract JDK version {} for {} with target {}", versionData.getMajor(), target.getPlatform(), target.getArchitecture());
 
     try {
-      if (platform.equals(Platform.WINDOWS)) {
+      if (target.getPlatform().equals(Platform.WINDOWS)) {
         var pathToJdkCompressedFile = pathToApplicationDataJdkDirectory.resolve(JDK_ZIP);
         FileUtilities.extractZip(pathToJdkCompressedFile, pathToApplicationDataJdkDirectory);
         Files.deleteIfExists(pathToJdkCompressedFile);
       } else {
         var pathToJdkCompressedFile = pathToApplicationDataJdkDirectory.resolve(JDK_TAR_GZ);
-        FileUtilities.extractTarGz(pathToJdkCompressedFile, pathToApplicationDataJdkDirectory, platform);
+        FileUtilities.extractTarGz(pathToJdkCompressedFile, pathToApplicationDataJdkDirectory, target.getPlatform());
         Files.deleteIfExists(pathToJdkCompressedFile);
       }
-      var versionPrefix = isOnlyFeatureVersion(versionData) ? String.valueOf(versionData.getMajor()) : versionData.getSemver();
+      var versionPrefix = isOnlyFeatureVersion(versionData) ? String.valueOf(versionData.getMajor()) : versionData.getOpenjdkVersion().replace("-LTS", "");
       var optionalPathToExtractedJdk = FileUtilities.optionalExtractedJdkPath(pathToApplicationDataJdkDirectory, versionPrefix);
       return optionalPathToExtractedJdk.orElse(null);
     } catch (Exception e) {
-      var message = format("Could not extract JDK for %s with architecture %s. Skipping further processing for this combination. Reason: %s", platform, architecture, e.getMessage());
+      var message = format("Could not extract JDK for %s with target %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return null;
     }
   }
 
-  public Path copyJdkToBundleDirectory(Platform platform, Architecture architecture, Path applicationDataDirectoryPath, VersionData versionDateToUse) {
-    var bundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(platform, architecture, applicationDataDirectoryPath, applicationDataDirectoryPath, versionDateToUse);
+  public Path copyJdkToBundleDirectory(Target target, Path extractedJdkPath, Path applicationDataDirectoryPath, VersionData versionDateToUse) {
+    var bundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(target, applicationDataDirectoryPath, extractedJdkPath, versionDateToUse);
     if (null != bundleDirectoryPath) {
       return bundleDirectoryPath;
     }
     return null;
   }
 
-  public Path copyJarFileAndCreateLauncherScriptToBundleDirectory(Platform platform, Architecture architecture, Path bundleDirectoryPath, Path jarFilePath, Warp4JCommandConfiguration warp4jCommandConfiguration) {
+  public Path copyJarFileAndCreateLauncherScriptToBundleDirectory(Target target, Path bundleDirectoryPath, Path jarFilePath, Warp4JCommandConfiguration warp4jCommandConfiguration) {
     var jarFileName = jarFilePath.getFileName().toString();
     String scriptContent;
     Path bundleScriptPath;
-    log.info("Copy jar to bundle folder and create launcher script for {} with architecture {} to {}", platform, architecture, bundleDirectoryPath);
+    log.info("Copy jar to bundle folder and create launcher script for {} with target {} to {}", target.getPlatform(), target.getArchitecture(), bundleDirectoryPath);
     try {
       Files.copy(jarFilePath, bundleDirectoryPath.resolve(jarFileName));
-      if (platform == Platform.WINDOWS) {
+      if (target.getPlatform() == Platform.WINDOWS) {
         scriptContent = getLauncherWindows("java", jarFileName, "", warp4jCommandConfiguration.isSilent());
         var jarFileWithoutExtension = jarFileName.split(JAR_EXTENSION_REGEX)[0] + ".bat";
         bundleScriptPath = Files.write(bundleDirectoryPath.resolve(jarFileWithoutExtension), scriptContent.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -79,22 +79,22 @@ public class FileService {
 
       return bundleScriptPath;
     } catch (Exception e) {
-      var message = format("Could not copy jar to bundle folder and create launcher script for %s with architecture %s. Skipping further processing for this combination. Reason: %s", platform, architecture, e.getMessage());
+      var message = format("Could not copy jar to bundle folder and create launcher script for %s with target %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return null;
     }
   }
 
-  public boolean compressBundle(Platform platform, Architecture architecture, Path bundledBinaryPath) {
-    log.info("Compress binary {} for {} with architecture {}", bundledBinaryPath, platform, architecture);
+  public boolean compressBundle(Target target, Path bundledBinaryPath) {
+    log.info("Compress binary {} for {} with target {}", bundledBinaryPath, target.getPlatform(), target.getArchitecture());
     try {
-      if (platform.equals(Platform.WINDOWS)) {
+      if (target.getPlatform().equals(Platform.WINDOWS)) {
         var targetCompressedFile = bundledBinaryPath.getParent().resolve(bundledBinaryPath.getFileName().toString().split("\\.exe")[0] + ".zip");
         FileUtilities.deleteRecursively(targetCompressedFile);
         log.debug(COMPRESS_AS_MESSAGE, bundledBinaryPath, targetCompressedFile);
         FileUtilities.createZip(bundledBinaryPath, targetCompressedFile);
-      } else if (platform.equals(Platform.LINUX)) {
+      } else if (target.getPlatform().equals(Platform.LINUX)) {
         var targetCompressedFile = bundledBinaryPath.getParent().resolve(bundledBinaryPath.getFileName().toString() + ".tar.gz");
         FileUtilities.deleteRecursively(targetCompressedFile);
         log.debug(COMPRESS_AS_MESSAGE, bundledBinaryPath, targetCompressedFile);
@@ -114,7 +114,7 @@ public class FileService {
       }
       return true;
     } catch (Exception e) {
-      var message = format("Could not compress binary for %s with architecture %s. Skipping further processing for this combination. Reason: %s", platform, architecture, e.getMessage());
+      var message = format("Could not compress binary for %s with target %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return false;

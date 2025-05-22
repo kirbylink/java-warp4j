@@ -3,12 +3,18 @@ package de.dddns.kirbylink.warp4j.config;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import javax.naming.NoPermissionException;
+import de.dddns.kirbylink.warp4j.model.Architecture;
+import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.utilities.ComponentFactory;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,6 +59,24 @@ public class Warp4JCommand implements Callable<Integer> {
   @Option(names = {"--windows"}, description = "Create binary for Windows")
   private boolean isWindows;
 
+  @Option(names = {"--linux-x64"}, description = "Create binary for Linux with x64 architecture")
+  private boolean isLinuxX64;
+
+  @Option(names = {"--linux-aarch64"}, description = "Create binary for Linux with aarch64 architecture")
+  private boolean isLinuxAarch64;
+
+  @Option(names = {"--macos-x64"}, description = "Create binary for macOS with x64 architecture")
+  private boolean isMacosX64;
+
+  @Option(names = {"--macos-aarch64"}, description = "Create binary for macOS with aarch64 architecture")
+  private boolean isMacosAarch64;
+
+  @Option(names = {"--windows-x64"}, description = "Create binary for Windows with x64 architecture")
+  private boolean isWindowsX64;
+
+  @Option(names = {"--windows-aarch64"}, description = "Create binary for Windows with aarch64 architecture")
+  private boolean isWindowsAarch64;
+
   @Option(names = {"--arch"}, description = "Target architecture (x64 or aarch64) Default: both")
   private String architecture;
 
@@ -87,7 +111,11 @@ public class Warp4JCommand implements Callable<Integer> {
           .jdkPath(jdkPath)
           .javaVersion(javaVersion)
           .linux(isLinux)
+          .linuxX64(isLinuxX64)
+          .linuxAarch64(isLinuxAarch64)
           .macos(isMacos)
+          .macosX64(isMacosX64)
+          .macosAarch64(isMacosAarch64)
           .optimize(isOptimize)
           .outputDirectoryPath(outputDirectoryPath)
           .prefix(prefix)
@@ -95,6 +123,8 @@ public class Warp4JCommand implements Callable<Integer> {
           .silent(isSilent)
           .verbose(verbose)
           .windows(isWindows)
+          .windowsX64(isWindowsX64)
+          .windowsAarch64(isWindowsAarch64)
           .build();
 
       var downloadUtilities = ComponentFactory.createDownloadUtilities();
@@ -161,14 +191,82 @@ public class Warp4JCommand implements Callable<Integer> {
     private final boolean optimize;
     private final String additionalModules;
     private final boolean linux;
+    private final boolean linuxX64;
+    private final boolean linuxAarch64;
     private final boolean macos;
+    private final boolean macosX64;
+    private final boolean macosAarch64;
     private final boolean windows;
+    private final boolean windowsX64;
+    private final boolean windowsAarch64;
     private final String architecture;
     private final boolean silent;
     private final boolean pull;
     private final Path jarFilePath;
     private final String jdkPath;
     private final boolean verbose;
+
+    public Set<Target> getAllSelectedTargets() {
+      Set<Target> targets = new HashSet<>();
+      targets.addAll(getExplicitTargets());
+
+      var architectures = getArchitecture() != null && !getArchitecture().isBlank() ? List.of(Architecture.fromValue(getArchitecture())) : List.of(Architecture.values());
+      var platforms = new ArrayList<Platform>();
+      if (isLinux()) {
+        platforms.add(Platform.LINUX);
+      }
+      if (isMacos()) {
+        platforms.add(Platform.MACOS);
+      }
+      if (isWindows()) {
+        platforms.add(Platform.WINDOWS);
+      }
+
+      platforms.stream()
+          .flatMap(platform -> architectures.stream()
+              .map(arch -> new Target(platform, arch)))
+          .filter(Warp4JConfiguration::supportedPlatformAndArchitectureByWarp)
+          .forEach(targets::add);
+
+      if (targets.isEmpty()) {
+        targets.addAll(Warp4JCommandConfiguration.getAllValidTargets());
+      }
+      return targets;
+    }
+
+    private List<Target> getExplicitTargets() {
+      List<Target> targets = new ArrayList<>();
+      if (isLinuxX64()) {
+        targets.add(new Target(Platform.LINUX, Architecture.X64));
+      }
+      if (isLinuxAarch64()) {
+        targets.add(new Target(Platform.LINUX, Architecture.AARCH64));
+      }
+      if (isMacosX64()) {
+        targets.add(new Target(Platform.MACOS, Architecture.X64));
+      }
+      if (isMacosAarch64()) {
+        targets.add(new Target(Platform.MACOS, Architecture.AARCH64));
+      }
+      if (isWindowsX64()) {
+        targets.add(new Target(Platform.WINDOWS, Architecture.X64));
+      }
+      if (isWindowsAarch64()) {
+        targets.add(new Target(Platform.WINDOWS, Architecture.AARCH64));
+      }
+      return targets;
+    }
+
+    private static Set<Target> getAllValidTargets() {
+      return Set.of(
+          new Target(Platform.LINUX, Architecture.X64),
+          new Target(Platform.LINUX, Architecture.AARCH64),
+          new Target(Platform.MACOS, Architecture.X64),
+          new Target(Platform.MACOS, Architecture.AARCH64),
+          new Target(Platform.WINDOWS, Architecture.X64),
+          new Target(Platform.WINDOWS, Architecture.AARCH64)
+      );
+    }
   }
 }
 

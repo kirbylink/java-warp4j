@@ -19,6 +19,7 @@ import org.mockito.MockedStatic;
 import de.dddns.kirbylink.warp4j.config.Warp4JCommand.Warp4JCommandConfiguration;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.FileUtilities;
 import de.dddns.kirbylink.warp4j.utilities.JLinkOptimizer;
@@ -152,13 +153,12 @@ class OptimizerServiceTest {
   @Test
   void testCreateOptimizedRuntime_WhenSuccess() throws IOException, InterruptedException {
     // Given
-    var platform = Platform.LINUX;
-    var arch = Architecture.X64;
     var mockedOutput = mock(Path.class);
-    when(mockedJLinkOptimizer.createOptimizedRuntime(eq(platform), eq(arch), any(), any(), any(), any(), any())).thenReturn(mockedOutput);
+    var target = new Target(Platform.LINUX, Architecture.X64);
+    when(mockedJLinkOptimizer.createOptimizedRuntime(eq(target), any(), any(), any(), any(), any())).thenReturn(mockedOutput);
 
     // When
-    var result = optimizerService.createOptimizedRuntime(platform, arch, mock(Path.class), new VersionData(), mock(Path.class), mock(Path.class), "java.base");
+    var result = optimizerService.createOptimizedRuntime(target, mock(Path.class), new VersionData(), mock(Path.class), mock(Path.class), "java.base");
 
     // Then
     assertThat(result).isEqualTo(mockedOutput);
@@ -167,10 +167,11 @@ class OptimizerServiceTest {
   @Test
   void testCreateOptimizedRuntime_WhenIOException_ThenReturnNull() throws IOException, InterruptedException {
     // Given
-    when(mockedJLinkOptimizer.createOptimizedRuntime(any(), any(), any(), any(), any(), any(), any())).thenThrow(new IOException("boom"));
+    var target = new Target(Platform.MACOS, Architecture.X64);
+    when(mockedJLinkOptimizer.createOptimizedRuntime(any(), any(), any(), any(), any(), any())).thenThrow(new IOException("boom"));
 
     // When
-    var result = optimizerService.createOptimizedRuntime(Platform.MACOS, Architecture.X64, mock(Path.class), new VersionData(), mock(Path.class), mock(Path.class), "mod");
+    var result = optimizerService.createOptimizedRuntime(target, mock(Path.class), new VersionData(), mock(Path.class), mock(Path.class), "mod");
 
     // Then
     assertThat(result).isNull();
@@ -179,11 +180,12 @@ class OptimizerServiceTest {
   @Test
   void testCreateOptimizedRuntime_WhenInterruptedException_ThenReturnNullAndInterrupt() throws IOException, InterruptedException {
     // Given
-    Thread.interrupted(); // clear first
-    when(mockedJLinkOptimizer.createOptimizedRuntime(any(), any(), any(), any(), any(), any(), any())).thenThrow(new InterruptedException("boom"));
+    Thread.interrupted();
+    var target = new Target(Platform.WINDOWS, Architecture.X64);
+    when(mockedJLinkOptimizer.createOptimizedRuntime(any(), any(), any(), any(), any(), any())).thenThrow(new InterruptedException("boom"));
 
     // When
-    var result = optimizerService.createOptimizedRuntime(Platform.WINDOWS, Architecture.X64, mock(Path.class), new VersionData(), mock(Path.class), mock(Path.class), "mod");
+    var result = optimizerService.createOptimizedRuntime(target, mock(Path.class), new VersionData(), mock(Path.class), mock(Path.class), "mod");
 
     // Then
     assertThat(result).isNull();

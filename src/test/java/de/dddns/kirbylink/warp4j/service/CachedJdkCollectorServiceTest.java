@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 
 class CachedJdkCollectorServiceTest {
@@ -63,11 +64,10 @@ class CachedJdkCollectorServiceTest {
 
     mockedFiles.when(() -> Files.isDirectory(mockedExtractedJdkPath)).thenReturn(true);
 
-    var listOfArchitectures = List.of(Architecture.X64);
-    var listOfPlatforms = List.of(Platform.WINDOWS);
+    var targets = Set.of(new Target(Platform.WINDOWS, Architecture.X64));
 
     // When
-    var result = service.collectCachedJdkStates(mockedApplicationDataDirectory, versionData, listOfArchitectures, listOfPlatforms);
+    var result = service.collectCachedJdkStates(mockedApplicationDataDirectory, versionData, targets);
 
     // Then
     assertThat(result).isNotNull().hasSize(1);
@@ -81,12 +81,11 @@ class CachedJdkCollectorServiceTest {
   void testCollectCachedJdkState_WhenNothingExists_ThenCleanupIsTrue() {
     // Given
     var versionData = new VersionData();
-    versionData.setMajor(17);
-    versionData.setMajor(17);
+    versionData.setMajor(21);
     versionData.setMinor(0);
-    versionData.setPatch(14);
-    versionData.setBuild(7);
-    versionData.setSemver("17.0.14+7");
+    versionData.setPatch(7);
+    versionData.setBuild(6);
+    versionData.setOpenjdkVersion("21.0.7+6-LTS");
 
     when(mockedApplicationDataDirectory.resolve("jdk")).thenReturn(mockedJdkDirectory);
     when(mockedJdkDirectory.resolve("linux")).thenReturn(mockedPlatformPath);
@@ -98,7 +97,8 @@ class CachedJdkCollectorServiceTest {
     mockedFiles.when(() -> Files.list(mockedArchitecturePath)).thenReturn(Stream.empty());
 
     // When
-    var result = service.collectCachedJdkState(mockedApplicationDataDirectory, Platform.LINUX, Architecture.X64, versionData);
+    var target = new Target(Platform.LINUX, Architecture.X64);
+    var result = service.collectCachedJdkState(mockedApplicationDataDirectory, target, versionData);
 
     // Then
     assertThat(result).isNotNull();
@@ -120,7 +120,8 @@ class CachedJdkCollectorServiceTest {
     mockedFiles.when(() -> Files.createDirectories(mockedArchitecturePath)).thenThrow(IOException.class);
 
     // When
-    var result = service.collectCachedJdkState(mockedApplicationDataDirectory, Platform.MACOS, Architecture.X64, versionData);
+    var target = new Target(Platform.MACOS, Architecture.X64);
+    var result = service.collectCachedJdkState(mockedApplicationDataDirectory, target, versionData);
 
     // Then
     assertThat(result).isNull();

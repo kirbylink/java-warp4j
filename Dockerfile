@@ -37,8 +37,7 @@ RUN bash -c 'set -e \
       --output /app/target \
       --optimize \
       --class-path ./classes/de/dddns/kirbylink/warp4j \
-      --linux \
-      --arch ${WARP_ARCH} \
+      --linux-${WARP_ARCH} \
       --prefix warp4j \
       --add-modules jdk.crypto.ec'
 
@@ -47,7 +46,7 @@ RUN bash -c 'set -e \
   && WARP_ARCH=$(cat /arch.txt) \
   && mkdir -p /root/.local/share/warp4j/warp \
   && curl -fsSL -o /root/.local/share/warp4j/warp/warp-packer \
-       https://github.com/kirbylink/warp/releases/download/1.0.0/linux-${WARP_ARCH}.warp-packer \
+       https://github.com/kirbylink/warp/releases/download/v1.1.0/linux-${WARP_ARCH}.warp-packer \
   && chmod +x /root/.local/share/warp4j/warp/warp-packer'
 
 # Copy generated bundle to a separate folder

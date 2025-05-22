@@ -10,10 +10,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
-import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.JdkProcessingState;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.FileUtilities;
 import lombok.extern.slf4j.Slf4j;
@@ -24,28 +25,28 @@ public class CachedJdkCollectorService {
   private static final String JDK_ZIP = "jdk.zip";
   private static final String JDK_TAR_GZ = "jdk.tar.gz";
 
-  public List<JdkProcessingState> collectCachedJdkStates(Path applicationDataDirectoryPath, VersionData versionData, List<Architecture> listOfArchitecture, List<Platform> listOfPlatforms) {
-    return listOfPlatforms.stream()
-        .flatMap(platform ->listOfArchitecture.stream()
-            .filter(architecture -> isSupportedTarget(architecture, platform))
-            .map(architecture -> collectCachedJdkState(applicationDataDirectoryPath, platform, architecture, versionData))
-            .filter(Objects::nonNull))
+  public List<JdkProcessingState> collectCachedJdkStates(Path applicationDataDirectoryPath, VersionData versionData, Set<Target> targets) {
+    return targets.stream()
+            .filter(target -> isSupportedTarget(target))
+            .map(target -> collectCachedJdkState(applicationDataDirectoryPath, target, versionData))
+            .filter(Objects::nonNull)
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  public JdkProcessingState collectCachedJdkState(Path applicationDataDirectoryPath, Platform platform, Architecture architecture, VersionData versionData) {
+  public JdkProcessingState collectCachedJdkState(Path applicationDataDirectoryPath, Target target, VersionData versionData) {
+    var platform = target.getPlatform();
+    var architecture = target.getArchitecture();
     log.info("Collect information about cached files for {} with architecture {}", platform, architecture);
     try {
       var applicationDataJdkDirectoryPath = applicationDataDirectoryPath.resolve(APPLICATION_DATA_JDK_DIRECTORY).resolve(platform.getValue()).resolve(architecture.getValue());
       Files.createDirectories(applicationDataJdkDirectoryPath);
       var jdkCompressedFilePath = applicationDataJdkDirectoryPath.resolve(platform.equals(Platform.WINDOWS) ? JDK_ZIP : JDK_TAR_GZ);
       var isDownloaded = Files.exists(jdkCompressedFilePath);
-      var versionPrefix = isOnlyFeatureVersion(versionData) ? String.valueOf(versionData.getMajor()) : versionData.getSemver();
+      var versionPrefix = isOnlyFeatureVersion(versionData) ? String.valueOf(versionData.getMajor()) : versionData.getOpenjdkVersion().replace("-LTS", "");
       var optionalExtractedJdkPath = FileUtilities.optionalExtractedJdkPath(applicationDataJdkDirectoryPath, versionPrefix);
 
       return JdkProcessingState.builder()
-          .architecture(architecture)
-          .platform(platform)
+          .target(target)
           .cleanuped(!isDownloaded && optionalExtractedJdkPath.isEmpty())
           .downloaded(isDownloaded)
           .extracted(optionalExtractedJdkPath.isPresent())

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 
 class JLinkOptimizerTest {
@@ -32,6 +33,7 @@ class JLinkOptimizerTest {
     // GIven
     var platform = Platform.MACOS;
     var architecture = Architecture.X64;
+    var target = new Target(platform, architecture);
     var applicationDataDirectory = Path.of("/tmp/test-app");
     var versionData = new VersionData();
     versionData.setMajor(17);
@@ -63,7 +65,7 @@ class JLinkOptimizerTest {
     when(processExecutor.execute(expectedCommand)).thenReturn(successResult);
 
     // When
-    jLinkOptimizer.createOptimizedRuntime(platform, architecture, applicationDataDirectory, jmodsPath, versionData, jlinkPath, modules);
+    jLinkOptimizer.createOptimizedRuntime(target, applicationDataDirectory, jmodsPath, versionData, jlinkPath, modules);
 
     // Then
     verify(processExecutor).execute(expectedCommand);
@@ -74,6 +76,7 @@ class JLinkOptimizerTest {
     // Given
     var platform = Platform.WINDOWS;
     var architecture = Architecture.AARCH64;
+    var target = new Target(platform, architecture);
     var applicationDataDirectory = Path.of("/tmp/test-app");
     var versionData = new VersionData();
     versionData.setMajor(11);
@@ -105,7 +108,7 @@ class JLinkOptimizerTest {
 
     // When
     var throwAbleMethod = catchThrowable(() -> {
-      jLinkOptimizer.createOptimizedRuntime(platform, architecture, applicationDataDirectory, jmodsPath, versionData, jlinkPath, modules);
+      jLinkOptimizer.createOptimizedRuntime(target, applicationDataDirectory, jmodsPath, versionData, jlinkPath, modules);
     });
 
     // Then

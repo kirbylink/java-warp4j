@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.JavaVersion;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 
 class Warp4JConfigurationTest {
@@ -76,9 +77,10 @@ class Warp4JConfigurationTest {
     // Given
     var architectureEnum = Architecture.fromValue(architecture);
     var platformEnum = Platform.valueOf(platform);
+    var target = new Target(platformEnum, architectureEnum);
 
     // When
-    var warpUrl = Warp4JConfiguration.getWarpUrl(architectureEnum, platformEnum);
+    var warpUrl = Warp4JConfiguration.getWarpUrl(target);
 
     // Then
     assertThat(warpUrl).isNotNull().containsIgnoringCase(platform).containsIgnoringCase(architectureEnum.toString());
@@ -320,7 +322,7 @@ class Warp4JConfigurationTest {
       "ARM, LINUX, true",
       "ARM, MACOS, false",
 
-      "AARCH64, WINDOWS, false",
+      "AARCH64, WINDOWS, true",
       "AARCH64, LINUX, true",
       "AARCH64, MACOS, true"
   })
@@ -328,9 +330,10 @@ class Warp4JConfigurationTest {
     // Given
     var architectureEnum = Architecture.valueOf(architecture);
     var platformEnum = Platform.valueOf(platform);
+    var target = new Target(platformEnum, architectureEnum);
 
     // When
-    var actual = Warp4JConfiguration.supportedPlatformAndArchitectureByAdoptium(architectureEnum, platformEnum);
+    var actual = Warp4JConfiguration.supportedPlatformAndArchitectureByAdoptium(target);
 
     // Then
     assertThat(actual).isEqualTo(expected);
@@ -350,17 +353,18 @@ class Warp4JConfigurationTest {
     "ARM, LINUX, false",
     "ARM, MACOS, false",
 
-    "AARCH64, WINDOWS, false",
+    "AARCH64, WINDOWS, true",
     "AARCH64, LINUX, true",
-    "AARCH64, MACOS, false"
+    "AARCH64, MACOS, true"
   })
   void testSupportedPlatformAndArchitectureByWarp(String architecture, String platform, boolean expected) {
     // Given
     var architectureEnum = Architecture.valueOf(architecture);
     var platformEnum = Platform.valueOf(platform);
+    var target = new Target(platformEnum, architectureEnum);
 
     // When
-    var actual = Warp4JConfiguration.supportedPlatformAndArchitectureByWarp(architectureEnum, platformEnum);
+    var actual = Warp4JConfiguration.supportedPlatformAndArchitectureByWarp(target);
 
     // Then
     assertThat(actual).isEqualTo(expected);

@@ -10,12 +10,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.naming.NoPermissionException;
 import de.dddns.kirbylink.warp4j.config.Warp4JConfiguration;
+import de.dddns.kirbylink.warp4j.config.Warp4JResources;
 import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.JavaVersion;
 import de.dddns.kirbylink.warp4j.model.Platform;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import de.dddns.kirbylink.warp4j.utilities.AdoptiumClient;
 import de.dddns.kirbylink.warp4j.utilities.DownloadUtilities;
+import de.dddns.kirbylink.warp4j.utilities.FileUtilities;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,10 +35,21 @@ public class DownloadService {
     var architecture = Architecture.fromValue(Warp4JConfiguration.getArchitecture());
     var platform = Platform.fromSystemPropertyOsName(Warp4JConfiguration.getOsName());
     log.info("Check if Warp Packer needs to be downloaded...");
-
+    
     if (Files.exists(warpPackerPath)) {
-      log.info("Warp Packer already exists: {}", warpPackerPath);
-      return;
+      var currentHash = FileUtilities.calculateSha256Hash(warpPackerPath);
+      var warpPackerPropertyName =  "warp.%s.%s".formatted(platform.getValue().toLowerCase(), architecture.getValue().toLowerCase());
+      var expectedHash = Warp4JResources.get(warpPackerPropertyName);
+      
+      log.debug("Current hash of warp-packer: {}", currentHash);
+      log.debug("Property name for needed warp-packer: {}", warpPackerPropertyName);
+      log.debug("Expected hash of warp-packer: {}", expectedHash);      
+      
+      if (currentHash.equals(expectedHash)) {
+        log.info("Warp Packer already exists and up to date: {}", warpPackerPath);
+        return;
+      }
+      log.info("Warp Packer found but version is incompatible with application.");
     }
 
     var warpPackerUrl = Warp4JConfiguration.getWarpUrl(architecture, platform);

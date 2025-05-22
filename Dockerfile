@@ -37,8 +37,7 @@ RUN bash -c 'set -e \
       --output /app/target \
       --optimize \
       --class-path ./classes/de/dddns/kirbylink/warp4j \
-      --linux \
-      --arch ${WARP_ARCH} \
+      --linux-${WARP_ARCH} \
       --prefix warp4j \
       --add-modules jdk.crypto.ec'
 

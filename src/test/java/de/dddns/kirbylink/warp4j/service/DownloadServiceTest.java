@@ -99,6 +99,26 @@ class DownloadServiceTest {
   }
 
   @Test
+  void testDownloadJdk_WhenExceptionOccurs_ThenReturnsFalse() throws IOException {
+    // Given
+    var mockedPath = mock(Path.class);
+    var target = new Target(Platform.LINUX, Architecture.X64);
+    var version = new VersionData();
+    version.setMajor(21);
+
+    when(adoptiumClient.getDownloadUrlForSpecificJavaVersionDataAndSystem(version, target)).thenReturn("https://example.com/jdk.tar.gz");
+    when(mockedPath.resolve(anyString())).thenReturn(mockedPath);
+    mockedFiles.when(() -> Files.createDirectories(mockedPath)).thenThrow(new IOException("No space left. Harddisk full."));
+
+    // When
+    var result = downloadService.downloadJdk(target, version, mockedPath);
+
+    // Then
+    assertThat(result).isFalse();
+    verify(downloadUtilities, never()).downloadFile(any(URL.class), any(Path.class));
+  }
+
+  @Test
   void testGetJavaVersionToUse_WhenFetchFailsButFallbackPossible_ThenReturnsFallback() throws IOException {
     // Given
     var version = "11";

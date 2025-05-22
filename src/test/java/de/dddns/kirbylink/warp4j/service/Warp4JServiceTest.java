@@ -49,6 +49,7 @@ class Warp4JServiceTest {
 
   private Warp4JCommandConfiguration mockedWarp4jCommandConfiguration;
   private Path mockedApplicationDataDirectoryPath;
+  private Path mockedExtractedPath;
   private Path mockedWarpPackerPath;
   private VersionData mockedVersionData;
   private Path mockedJarFilePath;
@@ -74,6 +75,7 @@ class Warp4JServiceTest {
 
     mockedWarp4jCommandConfiguration = mock(Warp4JCommandConfiguration.class);
     mockedApplicationDataDirectoryPath = mock(Path.class);
+    mockedExtractedPath = mock(Path.class);
     mockedWarpPackerPath = mock(Path.class);
     mockedVersionData = mock(VersionData.class);
     mockedJarFilePath = mock(Path.class);
@@ -259,7 +261,6 @@ class Warp4JServiceTest {
       var jdkProcessingState = JdkProcessingState.builder().target(target).downloaded(true).build();
       mockCollectionOfCachedFiles(jdkProcessingState);
 
-      var mockedExtractedPath = mock(Path.class);
       when(mockedFileService.extractJdkAndDeleteCompressedFile(target, mockedVersionData, mockedApplicationDataDirectoryPath)).thenReturn(mockedExtractedPath);
 
       // When
@@ -277,7 +278,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockInitialization("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var jdkProcessingState = JdkProcessingState.builder().target(target).extracted(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingState);
 
@@ -320,7 +320,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var differentTarget = new Target(Platform.LINUX, architecture);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(differentTarget).isTarget(true).extracted(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
@@ -351,7 +350,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
       when(mockedWarp4jCommandConfiguration.isOptimize()).thenReturn(true);
@@ -378,7 +376,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
       when(mockedWarp4jCommandConfiguration.isOptimize()).thenReturn(true);
@@ -409,7 +406,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
       when(mockedWarp4jCommandConfiguration.isOptimize()).thenReturn(true);
@@ -441,7 +437,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).optimized(true).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
 
@@ -450,7 +445,7 @@ class Warp4JServiceTest {
 
       // Then
       assertThat(actualReturnValue).isZero();
-      verify(mockedFileService, never()).copyJdkToBundleDirectory(any(), any(), any());
+      verify(mockedFileService, never()).copyJdkToBundleDirectory(any(), any(), any(), any());
     }
 
     @Test
@@ -460,7 +455,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
       mockCopyJdkToBundleDirectory(target);
@@ -470,7 +464,7 @@ class Warp4JServiceTest {
 
       // Then
       assertThat(actualReturnValue).isZero();
-      verify(mockedFileService).copyJdkToBundleDirectory(target, mockedApplicationDataDirectoryPath, mockedVersionData);
+      verify(mockedFileService).copyJdkToBundleDirectory(target, mockedExtractedPath, mockedApplicationDataDirectoryPath, mockedVersionData);
     }
   }
 
@@ -485,7 +479,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
       mockCopyJdkToBundleDirectory(target);
@@ -512,7 +505,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
       mockCopyJdkToBundleDirectory(target);
@@ -540,7 +532,6 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
-      var mockedExtractedPath = mock(Path.class);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
       mockCopyJdkToBundleDirectory(target);
@@ -560,7 +551,6 @@ class Warp4JServiceTest {
 
   void mockUntilJdkPreparation(String currentPlatformString, String currentOsNameString, Target currentTarget) throws IOException {
     mockInitialization(currentPlatformString, currentOsNameString, currentTarget);
-    var mockedExtractedPath = mock(Path.class);
     var jdkProcessingState = JdkProcessingState.builder().target(currentTarget).extracted(true).extractedJdkPath(mockedExtractedPath).build();
     mockCollectionOfCachedFiles(jdkProcessingState);
   }
@@ -584,7 +574,7 @@ class Warp4JServiceTest {
   }
 
   void mockCopyJdkToBundleDirectory(Target target) {
-    when(mockedFileService.copyJdkToBundleDirectory(target, mockedApplicationDataDirectoryPath, mockedVersionData)).thenReturn(mockedBundleDirectoryPath);
+    when(mockedFileService.copyJdkToBundleDirectory(target, mockedExtractedPath, mockedApplicationDataDirectoryPath, mockedVersionData)).thenReturn(mockedBundleDirectoryPath);
   }
 
   void mockCopyJarFileAndCreateLauncherScriptToBundleDirectory(Target target) {

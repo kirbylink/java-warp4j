@@ -36,9 +36,9 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
-import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.JavaVersion;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -300,10 +300,10 @@ public class FileUtilities {
     return cleanedJar;
   }
 
-  public static Path copyJdkToBundleDirectory(Platform platform, Architecture architecture, Path applicationDataDirectory, Path extractedJdkPath, VersionData versionData) {
+  public static Path copyJdkToBundleDirectory(Target target, Path applicationDataDirectory, Path extractedJdkPath, VersionData versionData) {
     var bundleDirectoryPath =
-        applicationDataDirectory.resolve(APPLICATION_DATA_BUNDLE_DIRECTORY).resolve(platform.getValue()).resolve(architecture.getValue()).resolve(APPLICATION_DATA_JAVA_DIRECTORY);
-    log.info("Copy JDK to bundle for {} with architecture {} to {}", platform, architecture, bundleDirectoryPath);
+        applicationDataDirectory.resolve(APPLICATION_DATA_BUNDLE_DIRECTORY).resolve(target.getPlatform().getValue()).resolve(target.getArchitecture().getValue()).resolve(APPLICATION_DATA_JAVA_DIRECTORY);
+    log.info("Copy JDK to bundle for {} with architecture {} to {}", target.getPlatform(), target.getArchitecture(), bundleDirectoryPath);
     try {
       Files.createDirectories(bundleDirectoryPath.getParent());
 
@@ -311,7 +311,7 @@ public class FileUtilities {
       FileUtilities.copyRecursively(jrePath, bundleDirectoryPath);
       return bundleDirectoryPath.getParent();
     } catch (Exception e) {
-      var message = format("Could not copy JDK to bundle forlder for %s with architecture %s. Skipping further processing for this combination. Reason: %s", platform, architecture, e.getMessage());
+      var message = format("Could not copy JDK to bundle forlder for %s with architecture %s. Skipping further procssing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return null;

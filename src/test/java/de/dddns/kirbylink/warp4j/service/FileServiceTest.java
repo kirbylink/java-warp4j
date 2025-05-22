@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -84,6 +85,21 @@ class FileServiceTest {
     }
 
     @Test
+    void testExtractJdkAndDeleteCompressedFile_WhenWindowsAndException_ThenNullIsReturned() {
+      // Given
+      var mockedApplicationDataDirectory = mock(Path.class);
+      var versionData = mock(VersionData.class);
+      when(mockedApplicationDataDirectory.resolve(anyString())).thenReturn(mockedApplicationDataDirectory);
+      mockedFileUtilities.when(() -> FileUtilities.extractZip(any(), any())).thenThrow(new IOException("No space left. Harddisk full."));
+
+      // When
+      var result = fileService.extractJdkAndDeleteCompressedFile(target, versionData, mockedApplicationDataDirectory);
+
+      // Then
+      assertThat(result).isNull();
+    }
+
+    @Test
     void testCompressBundle_WhenWindows_ThenZipCreated() {
       // Given
       var mockedBundlePath = mock(Path.class);
@@ -140,7 +156,7 @@ class FileServiceTest {
       // Given
       var versionData = new VersionData();
       versionData.setMajor(17);
-      versionData.setSemver("17.0.14+7");
+      versionData.setOpenjdkVersion("17.0.14+7");
 
       var mockedAppDataDir = mock(Path.class);
       var mockedJdkRoot = mock(Path.class);

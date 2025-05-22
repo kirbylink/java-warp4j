@@ -22,12 +22,16 @@ import java.util.jar.JarOutputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
+import de.dddns.kirbylink.warp4j.model.Architecture;
 import de.dddns.kirbylink.warp4j.model.JavaVersion;
 import de.dddns.kirbylink.warp4j.model.Platform;
+import de.dddns.kirbylink.warp4j.model.Target;
+import de.dddns.kirbylink.warp4j.model.adoptium.v3.VersionData;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -43,6 +47,12 @@ class FileUtilitiesTest {
   static void setup() throws IOException {
     zipFile = createTestZip(temporaryDirectory);
     tarGzFile = createTestTarGz(temporaryDirectory);
+  }
+
+  @AfterAll
+  static void cleanUp() throws IOException {
+    Files.delete(tarGzFile);
+    Files.delete(zipFile);
   }
 
   @Test
@@ -324,6 +334,39 @@ class FileUtilitiesTest {
       assertThat(entries).doesNotContain("module-info.class");
       assertThat(entries).contains("com/example/MyClass.class");
     }
+  }
+
+  @Test
+  void testCopyJdkToBundleDirectory_WhenJdkExists_ThenJdkPathIsCopied() throws IOException {
+    // Given
+    var target = new Target(Platform.LINUX, Architecture.X64);
+    var applicationDataDirectory = temporaryDirectory.resolve("application-data-folder");
+    var extractedJdkPath = applicationDataDirectory.resolve("jdk").resolve("linux").resolve("x64").resolve("jdk-17.0.15+6/");
+    Files.createDirectories(extractedJdkPath);
+    var versionData = new VersionData();
+    versionData.setMajor(17);
+    var expectedBundleDirectoryPath = applicationDataDirectory.resolve("bundle").resolve("linux").resolve("x64");
+
+    // When
+    var actualBundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(target, applicationDataDirectory, extractedJdkPath, versionData);
+
+    // Then
+    assertThat(actualBundleDirectoryPath).isEqualTo(expectedBundleDirectoryPath);
+  }
+
+  @Test
+  void testCopyJdkToBundleDirectory_WhenJdkNotExist_ThenJdkPathIsNotCopied() throws IOException {
+    // Given
+    var target = new Target(Platform.LINUX, Architecture.X64);
+    var applicationDataDirectory = temporaryDirectory.resolve("application-data-folder");
+    var versionData = new VersionData();
+    versionData.setMajor(17);
+
+    // When
+    var actualBundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(target, applicationDataDirectory, null, versionData);
+
+    // Then
+    assertThat(actualBundleDirectoryPath).isNull();
   }
 
   @Test

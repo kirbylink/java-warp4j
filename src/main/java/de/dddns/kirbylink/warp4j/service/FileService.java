@@ -27,7 +27,7 @@ public class FileService {
 
   public Path extractJdkAndDeleteCompressedFile(Target target, VersionData versionData, Path applicationDataDirectory) {
     var pathToApplicationDataJdkDirectory = applicationDataDirectory.resolve("jdk").resolve(target.getPlatform().getValue()).resolve(target.getArchitecture().getValue());
-    log.info("Extract JDK version {} for {} with target.getArchitecture() {}", versionData.getMajor(), target.getPlatform(), target.getArchitecture());
+    log.info("Extract JDK version {} for {} with target {}", versionData.getMajor(), target.getPlatform(), target.getArchitecture());
 
     try {
       if (target.getPlatform().equals(Platform.WINDOWS)) {
@@ -39,19 +39,19 @@ public class FileService {
         FileUtilities.extractTarGz(pathToJdkCompressedFile, pathToApplicationDataJdkDirectory, target.getPlatform());
         Files.deleteIfExists(pathToJdkCompressedFile);
       }
-      var versionPrefix = isOnlyFeatureVersion(versionData) ? String.valueOf(versionData.getMajor()) : versionData.getSemver();
+      var versionPrefix = isOnlyFeatureVersion(versionData) ? String.valueOf(versionData.getMajor()) : versionData.getOpenjdkVersion().replace("-LTS", "");
       var optionalPathToExtractedJdk = FileUtilities.optionalExtractedJdkPath(pathToApplicationDataJdkDirectory, versionPrefix);
       return optionalPathToExtractedJdk.orElse(null);
     } catch (Exception e) {
-      var message = format("Could not extract JDK for %s with target.getArchitecture() %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
+      var message = format("Could not extract JDK for %s with target %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return null;
     }
   }
 
-  public Path copyJdkToBundleDirectory(Target target, Path applicationDataDirectoryPath, VersionData versionDateToUse) {
-    var bundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(target.getPlatform(), target.getArchitecture(), applicationDataDirectoryPath, applicationDataDirectoryPath, versionDateToUse);
+  public Path copyJdkToBundleDirectory(Target target, Path extractedJdkPath, Path applicationDataDirectoryPath, VersionData versionDateToUse) {
+    var bundleDirectoryPath = FileUtilities.copyJdkToBundleDirectory(target, applicationDataDirectoryPath, extractedJdkPath, versionDateToUse);
     if (null != bundleDirectoryPath) {
       return bundleDirectoryPath;
     }
@@ -62,7 +62,7 @@ public class FileService {
     var jarFileName = jarFilePath.getFileName().toString();
     String scriptContent;
     Path bundleScriptPath;
-    log.info("Copy jar to bundle folder and create launcher script for {} with target.getArchitecture() {} to {}", target.getPlatform(), target.getArchitecture(), bundleDirectoryPath);
+    log.info("Copy jar to bundle folder and create launcher script for {} with target {} to {}", target.getPlatform(), target.getArchitecture(), bundleDirectoryPath);
     try {
       Files.copy(jarFilePath, bundleDirectoryPath.resolve(jarFileName));
       if (target.getPlatform() == Platform.WINDOWS) {
@@ -79,7 +79,7 @@ public class FileService {
 
       return bundleScriptPath;
     } catch (Exception e) {
-      var message = format("Could not copy jar to bundle folder and create launcher script for %s with target.getArchitecture() %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
+      var message = format("Could not copy jar to bundle folder and create launcher script for %s with target %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return null;
@@ -87,7 +87,7 @@ public class FileService {
   }
 
   public boolean compressBundle(Target target, Path bundledBinaryPath) {
-    log.info("Compress binary {} for {} with target.getArchitecture() {}", bundledBinaryPath, target.getPlatform(), target.getArchitecture());
+    log.info("Compress binary {} for {} with target {}", bundledBinaryPath, target.getPlatform(), target.getArchitecture());
     try {
       if (target.getPlatform().equals(Platform.WINDOWS)) {
         var targetCompressedFile = bundledBinaryPath.getParent().resolve(bundledBinaryPath.getFileName().toString().split("\\.exe")[0] + ".zip");
@@ -114,7 +114,7 @@ public class FileService {
       }
       return true;
     } catch (Exception e) {
-      var message = format("Could not compress binary for %s with target.getArchitecture() %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
+      var message = format("Could not compress binary for %s with target %s. Skipping further processing for this combination. Reason: %s", target.getPlatform(), target.getArchitecture(), e.getMessage());
       log.warn(message);
       log.debug(message, e);
       return false;

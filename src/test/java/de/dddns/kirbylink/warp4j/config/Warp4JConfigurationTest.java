@@ -320,7 +320,7 @@ class Warp4JConfigurationTest {
       "ARM, LINUX, true",
       "ARM, MACOS, false",
 
-      "AARCH64, WINDOWS, false",
+      "AARCH64, WINDOWS, true",
       "AARCH64, LINUX, true",
       "AARCH64, MACOS, true"
   })
@@ -350,9 +350,9 @@ class Warp4JConfigurationTest {
     "ARM, LINUX, false",
     "ARM, MACOS, false",
 
-    "AARCH64, WINDOWS, false",
+    "AARCH64, WINDOWS, true",
     "AARCH64, LINUX, true",
-    "AARCH64, MACOS, false"
+    "AARCH64, MACOS, true"
   })
   void testSupportedPlatformAndArchitectureByWarp(String architecture, String platform, boolean expected) {
     // Given

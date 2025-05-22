@@ -127,7 +127,7 @@ public class Warp4JConfiguration {
       case X32 -> supported = platform.equals(Platform.WINDOWS);
       case X64 -> supported = true;
       case ARM -> supported = platform.equals(Platform.LINUX);
-      case AARCH64 -> supported = platform.equals(Platform.LINUX) || platform.equals(Platform.MACOS);
+      case AARCH64 -> supported = true;
     }
 
     return supported;
@@ -138,7 +138,7 @@ public class Warp4JConfiguration {
 
     switch (architecture) {
       case X64 -> supported = true;
-      case AARCH64 -> supported = platform.equals(Platform.LINUX);
+      case AARCH64 -> supported = true;
       default -> log.debug("Unsupported architecture and platform by warp: {} and {}", architecture, platform);
     }
 

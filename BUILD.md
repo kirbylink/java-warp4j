@@ -49,7 +49,7 @@ mvn clean package -Dmaven.test.skip=true
 3. Run the CLI:
 
 ```sh
-java -jar target/warp4j-1.1.1-jar-with-dependencies.jar
+java -jar target/warp4j-1.1.2-jar-with-dependencies.jar
 ```
 
 ---
@@ -59,8 +59,8 @@ java -jar target/warp4j-1.1.1-jar-with-dependencies.jar
 To use the built JAR to generate optimized platform-specific packages, run:
 
 ```sh
-java -jar target/warp4j-1.1.1-jar-with-dependencies.jar \
-  --jar target/warp4j-1.1.1-jar-with-dependencies.jar \
+java -jar target/warp4j-1.1.2-jar-with-dependencies.jar \
+  --jar target/warp4j-1.1.2-jar-with-dependencies.jar \
   --output target \
   --optimize \
   --linux \

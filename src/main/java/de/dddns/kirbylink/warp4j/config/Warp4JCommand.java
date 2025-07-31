@@ -46,6 +46,9 @@ public class Warp4JCommand implements Callable<Integer> {
 
   @Option(names = {"--optimize"}, description = "Use optimized JRE instead of JDK")
   private boolean isOptimize;
+  
+  @Option(names = {"--no-compress"}, description = "Skip compression of the created binary file.")
+  private boolean isNoCompress;
 
   @Option(names = {"--add-modules"}, description = " A list of additional java modules that should be added to the optimized JDK. Separate each module with commas and no spaces")
   private String additionalModules = "";
@@ -117,6 +120,7 @@ public class Warp4JCommand implements Callable<Integer> {
           .macosX64(isMacosX64)
           .macosAarch64(isMacosAarch64)
           .optimize(isOptimize)
+          .compress(!isNoCompress)
           .outputDirectoryPath(outputDirectoryPath)
           .prefix(prefix)
           .pull(isPull)
@@ -189,6 +193,7 @@ public class Warp4JCommand implements Callable<Integer> {
     private final Path outputDirectoryPath;
     private final String prefix;
     private final boolean optimize;
+    private final boolean compress;
     private final String additionalModules;
     private final boolean linux;
     private final boolean linuxX64;

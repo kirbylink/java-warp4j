@@ -115,7 +115,7 @@ To use `java-warp4j`:
 After building or downloading `java-warp4j`, run:
 
 ```bash
-java -jar warp4j-1.1.2-jar-with-dependencies.jar \
+java -jar warp4j-1.1.3-jar-with-dependencies.jar \
   --jar my-app.jar \
   --output ./target \
   --optimize \
@@ -216,8 +216,8 @@ docker pull ghcr.io/kirbylink/java-warp4j:latest
 ### Example 1: Create a Linux aarch64 executable for [java-warp4j](https://github.com/kirbylink/java-warp4j)
 
 ```bash
-java -jar warp4j-1.1.2-jar-with-dependencies.jar \
-    --jar /home/developer/git/java-warp4j/target/warp4j-1.1.2-jar-with-dependencies.jar \
+java -jar warp4j-1.1.3-jar-with-dependencies.jar \
+    --jar /home/developer/git/java-warp4j/target/warp4j-1.1.3-jar-with-dependencies.jar \
 	--output /home/developer/git/java-warp4j/target \
 	--optimize \
 	--class-path /home/developer/git/java-warp4j/target/classes \
@@ -229,7 +229,7 @@ java -jar warp4j-1.1.2-jar-with-dependencies.jar \
 ### Example 2: Cross-compile for macOS and Windows for [java-e-liquid-calculator](https://github.com/kirbylink/java-e-liquid-calculator)
 
 ```bash
-java -jar warp4j-1.1.2-jar-with-dependencies.jar \
+java -jar warp4j-1.1.3-jar-with-dependencies.jar \
     --jar /home/developer/git/java-e-liquid-calculator/target/e-liquid-calculator-1.1.6-jar-with-dependencies.jar \
 	--output /home/developer/git/java-e-liquid-calculator/target \
 	--optimize \

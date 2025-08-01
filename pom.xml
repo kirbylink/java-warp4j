@@ -6,7 +6,7 @@
 	<artifactId>warp4j</artifactId>
 	<name>Java Warp4J</name>
 	<description>Java Application that turns JAR files (java archive) into self-contained executable in a single command</description>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.2.0</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

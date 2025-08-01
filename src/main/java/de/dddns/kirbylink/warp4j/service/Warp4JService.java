@@ -128,13 +128,15 @@ public class Warp4JService {
         .filter(Objects::nonNull)
         .toList();
 
-    log.info("Compress binaries...");
-    jdkProcessingStates = jdkProcessingStates.stream()
-        .filter(JdkProcessingState::isTarget)
-        .map(this::compressBundle)
-        .filter(Objects::nonNull)
-        .toList();
-
+    if (warp4jCommandConfiguration.isCompress()) {
+      log.info("Compress binaries...");
+      jdkProcessingStates = jdkProcessingStates.stream()
+          .filter(JdkProcessingState::isTarget)
+          .map(this::compressBundle)
+          .filter(Objects::nonNull)
+          .toList();
+    }
+    
     var successfulWarped = String.join(", ", jdkProcessingStates.stream().filter(JdkProcessingState::success).map(jdkProcessingState -> jdkProcessingState.bundledBinary().toString()).toList());
     log.debug("Warp successfull for: {}", successfulWarped);
 

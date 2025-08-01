@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.2.0] - 2025-08-01
+### Added
+- Command-Line Parameter for disabling compression
+
 ## [v1.1.3] - 2025-08-01
 ### Changed
 - Update Maven dependencies
@@ -56,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Supports optimization of different Java versions
 
 [unreleased]: https://github.com/kirbylink/java-warp4j/compare/main...HEAD
+[v1.2.0]: https://github.com/kirbylink/java-warp4j/compare/v1.1.3...v1.2.0
 [v1.1.3]: https://github.com/kirbylink/java-warp4j/compare/v1.1.2...v1.1.3
 [v1.1.2]: https://github.com/kirbylink/java-warp4j/compare/v1.1.1...v1.1.2
 [v1.1.1]: https://github.com/kirbylink/java-warp4j/compare/v1.1.0...v1.1.1

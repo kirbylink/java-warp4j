@@ -115,7 +115,7 @@ To use `java-warp4j`:
 After building or downloading `java-warp4j`, run:
 
 ```bash
-java -jar warp4j-1.1.3-jar-with-dependencies.jar \
+java -jar warp4j-1.2.0-jar-with-dependencies.jar \
   --jar my-app.jar \
   --output ./target \
   --optimize \
@@ -135,11 +135,12 @@ If you want to build and run directly from source, see [BUILD.md](./BUILD.md).
 ### Command-Line Parameters
 ```sh
 Usage: warp4j [-hsv] [--linux] [--linux-aarch64] [--linux-x64] [--macos]
-              [--macos-aarch64] [--macos-x64] [--optimize] [--pull]
-              [--spring-boot] [--windows] [--windows-aarch64] [--windows-x64]
-              [--add-modules=<additionalModules>] [--arch=<architecture>]
-              [-cp=<classPath>] [-j=<javaVersion>] --jar=<jarFilePath>
-              [--jdk=<jdkPath>] [-o=<outputDirectoryPath>] [-p=<prefix>]
+              [--macos-aarch64] [--macos-x64] [--no-compress] [--optimize]
+              [--pull] [--spring-boot] [--windows] [--windows-aarch64]
+              [--windows-x64] [--add-modules=<additionalModules>]
+              [--arch=<architecture>] [-cp=<classPath>] [-j=<javaVersion>]
+              --jar=<jarFilePath> [--jdk=<jdkPath>] [-o=<outputDirectoryPath>]
+              [-p=<prefix>]
 Turn JAR into a self-contained executable
       --add-modules=<additionalModules>
                              A list of additional java modules that should be
@@ -160,6 +161,7 @@ Turn JAR into a self-contained executable
       --macos               Create binary for macOS
       --macos-aarch64       Create binary for macOS with aarch64 architecture
       --macos-x64           Create binary for macOS with x64 architecture
+      --no-compress         Skip compression of the created binary file.
   -o, --output=<outputDirectoryPath>
                             Output directory (default: ./warped)
       --optimize            Use optimized JRE instead of JDK
@@ -216,8 +218,8 @@ docker pull ghcr.io/kirbylink/java-warp4j:latest
 ### Example 1: Create a Linux aarch64 executable for [java-warp4j](https://github.com/kirbylink/java-warp4j)
 
 ```bash
-java -jar warp4j-1.1.3-jar-with-dependencies.jar \
-    --jar /home/developer/git/java-warp4j/target/warp4j-1.1.3-jar-with-dependencies.jar \
+java -jar warp4j-1.2.0-jar-with-dependencies.jar \
+    --jar /home/developer/git/java-warp4j/target/warp4j-1.2.0-jar-with-dependencies.jar \
 	--output /home/developer/git/java-warp4j/target \
 	--optimize \
 	--class-path /home/developer/git/java-warp4j/target/classes \
@@ -229,7 +231,7 @@ java -jar warp4j-1.1.3-jar-with-dependencies.jar \
 ### Example 2: Cross-compile for macOS and Windows for [java-e-liquid-calculator](https://github.com/kirbylink/java-e-liquid-calculator)
 
 ```bash
-java -jar warp4j-1.1.3-jar-with-dependencies.jar \
+java -jar warp4j-1.2.0-jar-with-dependencies.jar \
     --jar /home/developer/git/java-e-liquid-calculator/target/e-liquid-calculator-1.1.6-jar-with-dependencies.jar \
 	--output /home/developer/git/java-e-liquid-calculator/target \
 	--optimize \

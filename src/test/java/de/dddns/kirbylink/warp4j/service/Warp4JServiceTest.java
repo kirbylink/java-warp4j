@@ -532,6 +532,7 @@ class Warp4JServiceTest {
       var architecture = Architecture.X64;
       var target = new Target(platform, architecture);
       mockUntilJdkPreparation("x64", "Windows 10", target);
+      when(mockedWarp4jCommandConfiguration.isCompress()).thenReturn(true);
       var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).build();
       mockCollectionOfCachedFiles(jdkProcessingStateTarget);
       mockCopyJdkToBundleDirectory(target);
@@ -546,6 +547,30 @@ class Warp4JServiceTest {
       // Then
       assertThat(actualReturnValue).isZero();
       verify(mockedFileService).compressBundle(target, mockedOutputDirectoryPath);
+    }
+    
+    @Test
+    void testCreateExecutableJarFile_WhenNoCompressOptionIsSelected_ThenWarpedBundleWillNotBeCompressed() throws IOException, NoPermissionException, InterruptedException {
+      // GIven
+      var platform = Platform.WINDOWS;
+      var architecture = Architecture.X64;
+      var target = new Target(platform, architecture);
+      mockUntilJdkPreparation("x64", "Windows 10", target);
+      when(mockedWarp4jCommandConfiguration.isCompress()).thenReturn(false);
+      var jdkProcessingStateTarget = JdkProcessingState.builder().target(target).isTarget(true).extractedJdkPath(mockedExtractedPath).build();
+      mockCollectionOfCachedFiles(jdkProcessingStateTarget);
+      mockCopyJdkToBundleDirectory(target);
+      mockCopyJarFileAndCreateLauncherScriptToBundleDirectory(target);
+      mockWarpBundle(target);
+      
+      when(mockedFileService.compressBundle(target, mockedOutputDirectoryPath)).thenReturn(true);
+      
+      // When
+      var actualReturnValue = warp4JService.createExecutableJarFile(mockedWarp4jCommandConfiguration);
+      
+      // Then
+      assertThat(actualReturnValue).isZero();
+      verify(mockedFileService, never()).compressBundle(target, mockedOutputDirectoryPath);
     }
   }
 

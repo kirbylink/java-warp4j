@@ -103,10 +103,11 @@ public class Warp4JConfiguration {
   }
 
   public static String getWarpUrl(Target target) {
+    var architecture = target.getArchitecture().equals(Architecture.X64) ? "x64" : "aarch64";
     return switch (target.getPlatform()) {
-      case LINUX -> target.getArchitecture().equals(Architecture.X64) ? Warp4JResources.get("warp.linux.x64.url") : Warp4JResources.get("warp.linux.aarch64.url");
-      case MACOS -> Warp4JResources.get("warp.macos.x64.url");
-      case WINDOWS -> Warp4JResources.get("warp.windows.x64.url");
+      case LINUX -> Warp4JResources.get("warp.linux." + architecture + ".url");
+      case MACOS -> Warp4JResources.get("warp.macos." + architecture + ".url");
+      case WINDOWS -> Warp4JResources.get("warp.windows." + architecture + ".url");
     };
   }
 

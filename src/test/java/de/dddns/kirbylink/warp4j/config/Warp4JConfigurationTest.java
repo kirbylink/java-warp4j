@@ -64,14 +64,17 @@ class Warp4JConfigurationTest {
 
   }
 
-  @ParameterizedTest(name = "Architecture: {0}, Platform: {1} => Supported: {2}")
+  @ParameterizedTest(name = "Architecture: {0}, Platform: {1}")
   @CsvSource({
     "x64, WINDOWS",
     "x64, LINUX",
-    "amd64, LINUX",
     "x64, MACOS",
-
-    "aarch64, LINUX",
+    "amd64, WINDOWS",
+    "amd64, LINUX",
+    "amd64, MACOS",
+    "aarch64, WINDOWS",
+    "aarch64, MACOS",
+    "aarch64, LINUX"
   })
   void testGetWarpUrl(String architecture, String platform) {
     // Given

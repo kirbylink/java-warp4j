@@ -19,19 +19,19 @@
 		<lombok.version>1.18.38</lombok.version>
 		<slf4j-api.version>2.0.17</slf4j-api.version>
 		<logback-classic.version>1.5.18</logback-classic.version>
-		<openapi-generator-maven-plugin.version>7.14.0</openapi-generator-maven-plugin.version>
-		<jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
-		<com.fasterxml.jackson.annotation.version>2.19.2</com.fasterxml.jackson.annotation.version>
-		<jackson-databind.version>2.19.2</jackson-databind.version>
-		<jackson-core.version>2.19.2</jackson-core.version>
+		<openapi-generator-maven-plugin.version>7.15.0</openapi-generator-maven-plugin.version>
+		<jackson-databind-nullable.version>0.2.7</jackson-databind-nullable.version>
+		<com.fasterxml.jackson.annotation.version>2.20</com.fasterxml.jackson.annotation.version>
+		<jackson-databind.version>2.20.0</jackson-databind.version>
+		<jackson-core.version>2.20.0</jackson-core.version>
 		<jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
 		<commons-compress.version>1.28.0</commons-compress.version>
 		<commons-io.version>2.20.0</commons-io.version>
 		<picocli.version>4.7.7</picocli.version>
-		<mockito-core.version>5.18.0</mockito-core.version>
+		<mockito-core.version>5.19.0</mockito-core.version>
 		<mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
 		<junit-jupiter.version>5.13.4</junit-jupiter.version>
-		<assertj-core.version>3.27.3</assertj-core.version>
+		<assertj-core.version>3.27.4</assertj-core.version>
 		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 		<maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
 		<maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>

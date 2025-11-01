@@ -15,27 +15,27 @@
 		<gitflow.productionBranch>main</gitflow.productionBranch>
 		<gitflow.developmentBranch>develop</gitflow.developmentBranch>
 		<gitflow.versionTagPrefix></gitflow.versionTagPrefix>
-		<jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 		<lombok.version>1.18.42</lombok.version>
 		<slf4j-api.version>2.0.17</slf4j-api.version>
-		<logback-classic.version>1.5.19</logback-classic.version>
-		<openapi-generator-maven-plugin.version>7.16.0</openapi-generator-maven-plugin.version>
-		<jackson-databind-nullable.version>0.2.7</jackson-databind-nullable.version>
+		<logback-classic.version>1.5.20</logback-classic.version>
+		<openapi-generator-maven-plugin.version>7.17.0</openapi-generator-maven-plugin.version>
+		<jackson-databind-nullable.version>0.2.8</jackson-databind-nullable.version>
 		<com.fasterxml.jackson.annotation.version>2.20</com.fasterxml.jackson.annotation.version>
-		<jackson-databind.version>2.20.0</jackson-databind.version>
-		<jackson-core.version>2.20.0</jackson-core.version>
+		<jackson-databind.version>2.20.1</jackson-databind.version>
+		<jackson-core.version>2.20.1</jackson-core.version>
 		<jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
 		<commons-compress.version>1.28.0</commons-compress.version>
 		<commons-io.version>2.20.0</commons-io.version>
 		<picocli.version>4.7.7</picocli.version>
 		<mockito-core.version>5.20.0</mockito-core.version>
 		<mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
-		<junit-jupiter.version>6.0.0</junit-jupiter.version>
+		<junit-jupiter.version>6.0.1</junit-jupiter.version>
 		<assertj-core.version>3.27.6</assertj-core.version>
 		<maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
 		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
 		<maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
-		<maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
+		<maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
 		<gitflow-maven-plugin.version>1.21.0</gitflow-maven-plugin.version>
 		<properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
 	</properties>

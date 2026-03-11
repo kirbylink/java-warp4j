@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.2.9] - 2026-03-12
+### Fixed
+- Enable macOS AArch64 support with warp-packer v1.2.0
+
 ## [v1.2.8] - 2026-03-01
 ### Changed
 - Update Maven dependencies
@@ -92,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Supports optimization of different Java versions
 
 [unreleased]: https://github.com/kirbylink/java-warp4j/compare/main...HEAD
+[v1.2.9]: https://github.com/kirbylink/java-warp4j/compare/v1.2.8...v1.2.9
 [v1.2.8]: https://github.com/kirbylink/java-warp4j/compare/v1.2.7...v1.2.8
 [v1.2.7]: https://github.com/kirbylink/java-warp4j/compare/v1.2.6...v1.2.7
 [v1.2.6]: https://github.com/kirbylink/java-warp4j/compare/v1.2.5...v1.2.6

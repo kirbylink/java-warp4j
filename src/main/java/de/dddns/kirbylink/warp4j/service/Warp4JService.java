@@ -339,7 +339,8 @@ public class Warp4JService {
     var bundleScriptPath = jdkProcessingState.bundleScriptPath();
     var outputFilePath = outputDirectory.resolve(jarFileName + "-" + platform.getValue() + "-" + architecture.getValue() + (platform == Platform.WINDOWS ? ".exe" : ""));
     var prefix = warp4JCommandConfiguration.getPrefix();
-    var isWarped = warpService.warpBundle(target, bundleDirectoryPath, bundleScriptPath, outputFilePath, warpPackerPath, prefix);
+    var isSilent = warp4JCommandConfiguration.isSilent();
+    var isWarped = warpService.warpBundle(target, bundleDirectoryPath, bundleScriptPath, outputFilePath, warpPackerPath, prefix, isSilent);
 
     if (isWarped) {
       return jdkProcessingState.toBuilder().success(true).bundledBinary(outputFilePath).build();

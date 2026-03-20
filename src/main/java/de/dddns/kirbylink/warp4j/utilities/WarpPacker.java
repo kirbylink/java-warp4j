@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import de.dddns.kirbylink.warp4j.model.Platform;
 import de.dddns.kirbylink.warp4j.model.Target;
 import de.dddns.kirbylink.warp4j.model.Warp4JRuntimeException;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ public class WarpPacker {
 
   private final ProcessExecutor processExecutor;
 
-  public void warpApplication(Path warpPackerPath, Target target, Path bundlePath, String scriptName, Path outputPath, String prefix) throws IOException, InterruptedException {
+  public void warpApplication(Path warpPackerPath, Target target, Path bundlePath, String scriptName, Path outputPath, String prefix, boolean isSilent) throws IOException, InterruptedException {
     List<String> command = new ArrayList<>(List.of(warpPackerPath.toString(), "pack",
         "--arch", target.getPlatform().toString().toLowerCase() + "-" + target.getArchitecture().getValue(),
         "--input-dir", bundlePath.toString(),
@@ -26,6 +27,10 @@ public class WarpPacker {
     if (null != prefix && !prefix.isBlank()) {
       command.add("--prefix");
       command.add(prefix);
+    }
+
+    if (isSilent && target.getPlatform().equals(Platform.WINDOWS)) {
+      command.add("--hidden");
     }
 
     log.debug("Executing command: {}", String.join(" ", command));

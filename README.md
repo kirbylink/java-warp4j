@@ -13,6 +13,11 @@
 [![Abdeckung](https://sonarqube.phoenix.ipv64.de/api/project_badges/measure?project=de.dddns.kirbylink%3Awarp4j&metric=coverage&token=sqb_dd31b2e40b425c0c0283fa9cf0fa1275e03855eb)](https://sonarqube.phoenix.ipv64.de/dashboard?id=de.dddns.kirbylink%3Awarp4j) for `main`<br /> 
 [![Abdeckung](https://sonarqube.phoenix.ipv64.de/api/project_badges/measure?branch=develop&project=de.dddns.kirbylink%3Awarp4j&metric=coverage&token=sqb_dd31b2e40b425c0c0283fa9cf0fa1275e03855eb)](https://sonarqube.phoenix.ipv64.de/dashboard?id=de.dddns.kirbylink%3Awarp4j&branch=develop) for `develop`<br />
 
+![GitHub Release](https://img.shields.io/github/v/release/kirbylink/java-warp4j)
+![GitHub Downloads](https://img.shields.io/github/downloads/kirbylink/java-warp4j/latest/total)
+![GitHub Downloads](https://img.shields.io/github/downloads/kirbylink/java-warp4j/total)
+![License](https://img.shields.io/github/license/kirbylink/java-warp4j)
+
 # java-warp4j
 
 Warp4J rewritten in Java — build platform-specific executables from Java JARs with minimal JREs.

@@ -13,6 +13,11 @@
 [![Abdeckung](https://sonarqube.phoenix.ipv64.de/api/project_badges/measure?project=de.dddns.kirbylink%3Awarp4j&metric=coverage&token=sqb_dd31b2e40b425c0c0283fa9cf0fa1275e03855eb)](https://sonarqube.phoenix.ipv64.de/dashboard?id=de.dddns.kirbylink%3Awarp4j) for `main`<br /> 
 [![Abdeckung](https://sonarqube.phoenix.ipv64.de/api/project_badges/measure?branch=develop&project=de.dddns.kirbylink%3Awarp4j&metric=coverage&token=sqb_dd31b2e40b425c0c0283fa9cf0fa1275e03855eb)](https://sonarqube.phoenix.ipv64.de/dashboard?id=de.dddns.kirbylink%3Awarp4j&branch=develop) for `develop`<br />
 
+![GitHub Release](https://img.shields.io/github/v/release/kirbylink/java-warp4j)
+![GitHub Downloads](https://img.shields.io/github/downloads/kirbylink/java-warp4j/latest/total)
+![GitHub Downloads](https://img.shields.io/github/downloads/kirbylink/java-warp4j/total)
+![License](https://img.shields.io/github/license/kirbylink/java-warp4j)
+
 # java-warp4j
 
 Warp4J rewritten in Java — build platform-specific executables from Java JARs with minimal JREs.
@@ -115,7 +120,7 @@ To use `java-warp4j`:
 After building or downloading `java-warp4j`, run:
 
 ```bash
-java -jar warp4j-1.2.9-jar-with-dependencies.jar \
+java -jar warp4j-1.3.0-jar-with-dependencies.jar \
   --jar my-app.jar \
   --output ./target \
   --optimize \
@@ -218,8 +223,8 @@ docker pull ghcr.io/kirbylink/java-warp4j:latest
 ### Example 1: Create a Linux aarch64 executable for [java-warp4j](https://github.com/kirbylink/java-warp4j)
 
 ```bash
-java -jar warp4j-1.2.9-jar-with-dependencies.jar \
-    --jar /home/developer/git/java-warp4j/target/warp4j-1.2.9-jar-with-dependencies.jar \
+java -jar warp4j-1.3.0-jar-with-dependencies.jar \
+    --jar /home/developer/git/java-warp4j/target/warp4j-1.3.0-jar-with-dependencies.jar \
 	--output /home/developer/git/java-warp4j/target \
 	--optimize \
 	--class-path /home/developer/git/java-warp4j/target/classes \
@@ -231,7 +236,7 @@ java -jar warp4j-1.2.9-jar-with-dependencies.jar \
 ### Example 2: Cross-compile for macOS and Windows for [java-e-liquid-calculator](https://github.com/kirbylink/java-e-liquid-calculator)
 
 ```bash
-java -jar warp4j-1.2.9-jar-with-dependencies.jar \
+java -jar warp4j-1.3.0-jar-with-dependencies.jar \
     --jar /home/developer/git/java-e-liquid-calculator/target/e-liquid-calculator-1.1.6-jar-with-dependencies.jar \
 	--output /home/developer/git/java-e-liquid-calculator/target \
 	--optimize \

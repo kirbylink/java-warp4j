@@ -41,6 +41,7 @@ class WarpPackerTest {
     var scriptName = "start.sh";
     var outputPath = tempDir.resolve("output");
     var prefix = "";
+    var isSilent = true;
     var expectedCommand = List.of(warpPackerPath.toString(), "pack",
         "--arch", "linux-x64",
         "--input-dir", bundlePath.toString(),
@@ -51,7 +52,7 @@ class WarpPackerTest {
     when(processExecutor.execute(anyList())).thenReturn(mockResult);
 
     // When
-    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix);
+    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix, isSilent);
 
     // Then
     verify(processExecutor).execute(expectedCommand);
@@ -66,6 +67,7 @@ class WarpPackerTest {
     var scriptName = "start.sh";
     var outputPath = tempDir.resolve("output");
     var prefix = "application-name";
+    var isSilent = false;
     var expectedCommand = List.of(warpPackerPath.toString(), "pack",
         "--arch", "linux-x64",
         "--input-dir", bundlePath.toString(),
@@ -77,8 +79,36 @@ class WarpPackerTest {
     when(processExecutor.execute(anyList())).thenReturn(mockResult);
 
     // When
-    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix);
+    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix, isSilent);
 
+    // Then
+    verify(processExecutor).execute(expectedCommand);
+  }
+  
+  @Test
+  void testWarpApplication_WithWindowsAsPlatformAndSilentShouldExecuteWarpPacker() throws IOException, InterruptedException {
+    // Given
+    var warpPackerPath = tempDir.resolve("warp-packer");
+    var target = new Target(Platform.WINDOWS, Architecture.X64);
+    var bundlePath = tempDir.resolve("bundle");
+    var scriptName = "start.sh";
+    var outputPath = tempDir.resolve("output");
+    var prefix = "application-name";
+    var isSilent = true;
+    var expectedCommand = List.of(warpPackerPath.toString(), "pack",
+        "--arch", "windows-x64",
+        "--input-dir", bundlePath.toString(),
+        "--exec", "start.sh",
+        "--unique-id",
+        "--output", outputPath.toString(),
+        "--prefix", "application-name",
+        "--hidden");
+    var mockResult = new ExecutionResult(0, Collections.emptyList(), Collections.emptyList());
+    when(processExecutor.execute(anyList())).thenReturn(mockResult);
+    
+    // When
+    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix, isSilent);
+    
     // Then
     verify(processExecutor).execute(expectedCommand);
   }
@@ -92,6 +122,7 @@ class WarpPackerTest {
     var scriptName = "start.sh";
     var outputPath = tempDir.resolve("output");
     String prefix = null;
+    var isSilent = false;
     var expectedCommand = List.of(warpPackerPath.toString(), "pack",
         "--arch", "linux-x64",
         "--input-dir", bundlePath.toString(),
@@ -103,7 +134,7 @@ class WarpPackerTest {
 
     // When
     var exception = assertThrows(RuntimeException.class, () ->
-    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix));
+    warpPacker.warpApplication(warpPackerPath, target, bundlePath, scriptName, outputPath, prefix, isSilent));
 
     // Then
     assertThat(exception.getMessage()).isEqualTo("Failed to optimize runtime");

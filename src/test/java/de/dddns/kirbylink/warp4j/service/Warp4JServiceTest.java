@@ -517,7 +517,7 @@ class Warp4JServiceTest {
 
       // Then
       assertThat(actualReturnValue).isZero();
-      verify(mockedWarpService).warpBundle(target, mockedBundleDirectoryPath, mockedBundleScriptPath, mockedOutputDirectoryPath, mockedWarpPackerPath, "application");
+      verify(mockedWarpService).warpBundle(target, mockedBundleDirectoryPath, mockedBundleScriptPath, mockedOutputDirectoryPath, mockedWarpPackerPath, "application", false);
     }
   }
 
@@ -610,7 +610,7 @@ class Warp4JServiceTest {
   void mockWarpBundle(Target target) {
     var prefix = "application";
     when(mockedWarp4jCommandConfiguration.getPrefix()).thenReturn(prefix);
-    when(mockedWarpService.warpBundle(target, mockedBundleDirectoryPath, mockedBundleScriptPath, mockedOutputDirectoryPath, mockedWarpPackerPath, prefix)).thenReturn(true);
+    when(mockedWarpService.warpBundle(target, mockedBundleDirectoryPath, mockedBundleScriptPath, mockedOutputDirectoryPath, mockedWarpPackerPath, prefix, false)).thenReturn(true);
   }
 }
 

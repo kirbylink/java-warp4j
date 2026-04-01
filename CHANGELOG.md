@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.3.1] - 2026-04-01
+### Changed
+- Update Maven dependencies
+
 ## [v1.3.0] - 2026-03-20
 ### Added
 - Support warp-packer v1.3.0 and hidden console window
@@ -100,6 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Supports optimization of different Java versions
 
 [unreleased]: https://github.com/kirbylink/java-warp4j/compare/main...HEAD
+[v1.3.1]: https://github.com/kirbylink/java-warp4j/compare/v1.3.0...v1.3.1
 [v1.3.0]: https://github.com/kirbylink/java-warp4j/compare/v1.2.9...v1.3.0
 [v1.2.9]: https://github.com/kirbylink/java-warp4j/compare/v1.2.8...v1.2.9
 [v1.2.8]: https://github.com/kirbylink/java-warp4j/compare/v1.2.7...v1.2.8

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.3.5] - 2026-08-01
+### Changed
+- Update Maven dependencies
+
 ## [v1.3.4] - 2026-07-01
 ### Changed
 - Update Maven dependencies
@@ -116,6 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Supports optimization of different Java versions
 
 [unreleased]: https://github.com/kirbylink/java-warp4j/compare/main...HEAD
+[v1.3.5]: https://github.com/kirbylink/java-warp4j/compare/v1.3.4...v1.3.5
 [v1.3.4]: https://github.com/kirbylink/java-warp4j/compare/v1.3.3...v1.3.4
 [v1.3.3]: https://github.com/kirbylink/java-warp4j/compare/v1.3.2...v1.3.3
 [v1.3.2]: https://github.com/kirbylink/java-warp4j/compare/v1.3.1...v1.3.2
